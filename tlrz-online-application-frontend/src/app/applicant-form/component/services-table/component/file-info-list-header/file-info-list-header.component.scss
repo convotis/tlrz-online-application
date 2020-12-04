@@ -1,0 +1,20 @@
+:host {
+    width: 100%;
+}
+.file-info {
+    display: flex;
+    justify-content: space-between;
+    white-space: nowrap;
+}
+.file-info-file-name {
+    flex-basis: 65%;
+    flex-shrink: 0;
+    padding-right: 5px;
+    white-space: nowrap;
+    word-break: break-all;
+}
+.file-info-type {
+    flex-basis: 35%;
+    white-space: nowrap;
+    word-break: break-all;
+}

@@ -1,0 +1,60 @@
+<div class="modal-header modal-custom-header">
+
+    <h1> Kurzantrag auf Beihilfe </h1>
+
+</div>
+
+<div class="modal-body modal-custom-body">
+
+
+    <div *ngIf="this.step == 1">
+
+        <p class="text-center">
+            Mit dem Absenden wird der Antrag verschlüsselt an die Beihilfestelle gesendet. Sie erhalten nach erfolgreicher Übermittlung eine Quittung (PDF-Datei). Diese können Sie auf Ihrem Rechner speichern oder für Ihre Unterlagen ausdrucken.
+        </p>
+
+        <small *ngIf="this.files.size > 104857600"
+               class="invalid-input-small">
+            Die Summe der Größen aller hochgeladenen Dateien darf 100 MB nicht übersteigen!
+        </small>
+
+        <div class="d-flex justify-content-between previous-next">
+            <button (click)="bsModalRef.hide()" class="btn btn-primary custom-button" type="button"> Zurück</button>
+            <button (click)="submit()" class="btn btn-primary custom-button" type="button"> Absenden</button>
+        </div>
+
+    </div>
+
+
+    <div *ngIf="this.step == 2">
+        <p class="text-center">
+            Ihr Kurzantrag auf Beihilfe wird übermittelt.
+        </p>
+
+        <progressbar [value]="this.progress"></progressbar>
+    </div>
+
+    <div *ngIf="this.step == 3" class="block-center">
+
+        <div *ngIf="this.pdfURL ? this.pdfURL.length > 0 : false ">
+            <p>
+                Ihr Online-Kurzantrag auf Beihilfe wurde am {{this.time}} Uhr (Ortszeit Erfurt) angenommen.
+            </p>
+        </div>
+
+        <p *ngIf="this.pdfURL ? this.pdfURL.length <= 0 : true "> Bei der Verarbeitung Ihres Antrages am {{this.time}} Uhr ist ein Fehler aufgetreten. Bitte wenden Sie sich zur Klärung an das <a href="https://verwaltung.thueringen.de/web/guest/kontakt" target="_blank">Service Center</a>. Geben Sie hier bitte das Datum und die Uhrzeit dieser Fehlermeldung sowie Ihren Namen und Vornamen an. </p>
+
+        <div class="d-flex justify-content-between previous-next">
+            <button *ngIf="this.pdfURL ? this.pdfURL.length > 0 : false " (click)="showPdf()" class="btn btn-primary custom-button" type="button">
+                Quittung anzeigen (PDF)
+            </button>
+            <button (click)="finishSubmit()" class="btn btn-primary custom-button" type="button">
+                Beenden
+            </button>
+        </div>
+
+
+    </div>
+
+</div>
+

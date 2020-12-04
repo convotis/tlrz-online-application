@@ -1,0 +1,16 @@
+Bundle-Name: PDF Creation
+Bundle-SymbolicName: de.xdot.pdf.creation
+Bundle-Version: 1.0.0
+Export-Package: \
+    de.xdot.pdf.creation.model,\
+    de.xdot.pdf.creation.model.sub,\
+    de.xdot.pdf.creation.service
+Import-Package: *;resolution:=optional
+-includeresource: \
+    META-INF/lib/pdfbox.jar=pdfbox-[0-9]*.jar;lib:=true,\
+    META-INF/lib/jempbox.jar=jempbox-[0-9]*.jar;lib:=true,\
+    META-INF/lib/fontbox.jar=fontbox-[0-9]*.jar;lib:=true,\
+    META-INF/lib/boxable.jar=boxable-[0-9]*.jar;lib:=true,\
+    META-INF/lib/guava.jar=guava-[0-9]*.jar;lib:=true,\
+    src/main/resources/META-INF/resources
+

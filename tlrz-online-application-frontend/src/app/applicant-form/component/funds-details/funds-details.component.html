@@ -1,0 +1,268 @@
+<form [formGroup]="applicantAndFundsGroup">
+
+    <div class="card">
+        <div class="card-body">
+
+            <p class="card-text"> Es sollen Aufwendungen für den Antragsteller geltend gemacht werden:</p>
+
+            <div [ngClass]="{'is-invalid-radio': this.applicantExpenses.touched &&
+                                                 this.applicantExpenses.dirty &&
+                                                 this.applicantExpenses.invalid }">
+                <div class="form-check">
+                    <input class="form-check-input"
+                           formControlName="applicantExpenses"
+                           id="applicantExpensesRadio1"
+                           name="applicantExpenses"
+                           type="radio"
+                           value="true">
+                    <label class="form-check-label" for="applicantExpensesRadio1"> Ja </label>
+                </div>
+
+                <div class="form-check">
+                    <input class="form-check-input"
+                           formControlName="applicantExpenses"
+                           id="applicantExpensesRadio0"
+                           name="applicantExpenses"
+                           type="radio"
+                           value="false">
+                    <label class="form-check-label" for="applicantExpensesRadio0"> Nein </label>
+                </div>
+            </div>
+
+            <small *ngIf="this.applicantExpenses.touched &&
+                              this.applicantExpenses.dirty &&
+                              this.applicantExpenses.invalid"
+                   class="invalid-input-small">
+                {{ errMsgService.getErrMsgByKey('requiredRadio') }}
+            </small>
+        </div>
+
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+
+            <p class="card-text"> Es sollen Aufwendungen für Kinder geltend gemacht werden:</p>
+
+            <div [ngClass]="{'is-invalid-radio': this.expensesForChildren.touched &&
+                                                 this.expensesForChildren.dirty &&
+                                                 this.expensesForChildren.invalid }">
+                <div class="form-check">
+                    <input class="form-check-input"
+                           formControlName="expensesForChildren"
+                           id="expensesForChildrenRadio1"
+                           name="expensesForChildren"
+                           type="radio"
+                           value="true">
+                    <label class="form-check-label" for="expensesForChildrenRadio1"> Ja </label>
+                </div>
+
+                <div class="form-check">
+                    <input class="form-check-input"
+                           formControlName="expensesForChildren"
+                           id="expensesForChildrenRadio0"
+                           name="expensesForChildren"
+                           type="radio"
+                           value="false">
+                    <label class="form-check-label" for="expensesForChildrenRadio0"> Nein </label>
+                </div>
+            </div>
+
+            <small *ngIf="this.expensesForChildren.touched &&
+                              this.expensesForChildren.dirty &&
+                              this.expensesForChildren.invalid"
+                   class="invalid-input-small">
+                {{ errMsgService.getErrMsgByKey('requiredRadio') }}
+            </small>
+        </div>
+
+    </div>
+
+    <div class="card">
+
+        <div class="card-body">
+
+            <p class="card-text">
+                Es sollen Aufwendungen für den/die Ehegatten/in oder Lebenspartner/in (nach § 1 LPartG)
+                geltend gemacht werden:
+            </p>
+
+            <div [ngClass]="{'is-invalid-radio': this.expensesForPartner.touched &&
+                                                 this.expensesForPartner.dirty &&
+                                                 this.expensesForPartner.invalid }"
+            >
+                <div class="form-check">
+                    <input (click)="setPartnerControlsValidators()"
+                           class="form-check-input"
+                           formControlName="expensesForPartner"
+                           id="expensesForPartnerRadio1"
+                           name="expensesForPartner"
+                           type="radio"
+                           value="true">
+                    <label class="form-check-label" for="expensesForPartnerRadio1"> Ja </label>
+                </div>
+
+                <div class="form-check">
+                    <input (click)="removePartnerControlsValidators()"
+                           class="form-check-input"
+                           formControlName="expensesForPartner"
+                           id="expensesForPartnerRadio0"
+                           name="expensesForPartner"
+                           type="radio"
+                           value="false">
+                    <label class="form-check-label" for="expensesForPartnerRadio0"> Nein </label>
+                </div>
+
+            </div>
+            <small *ngIf="this.expensesForPartner.touched &&
+                              this.expensesForPartner.dirty &&
+                              this.expensesForPartner.invalid"
+                   class="invalid-input-small">
+                {{ errMsgService.getErrMsgByKey('requiredRadio') }}
+            </small>
+
+
+            <div [hidden]="this.expensesForPartner.value != 'true'">
+                <div class="row">
+                    <div class="col-md-6">
+
+                        <div class="form-group">
+                            <label for="partnerFirstNameInput"> Vorname
+                            </label>
+
+                            <input [ngClass]="{'is-invalid-radio': this.partnerFirstName.touched &&
+                                                                   this.partnerFirstName.dirty &&
+                                                                   this.partnerFirstName.invalid }"
+                                   autocomplete="off"
+                                   class="form-control"
+                                   formControlName="partnerFirstName"
+                                   id="partnerFirstNameInput"
+                                   type="text">
+
+                            <small *ngIf="this.partnerFirstName.touched &&
+                                              this.partnerFirstName.dirty &&
+                                              this.partnerFirstName.invalid"
+                                   class="invalid-input-small">
+                                {{ this.errMsgService.getErrMsg(this.partnerFirstName) }}
+                            </small>
+                        </div>
+
+                    </div>
+                    <div class="col-md-6">
+
+                        <div class="form-group">
+                            <label for="differentLastNameInput"> ggf. abweichender Familienname </label>
+                            <input autocomplete="off"
+                                   class="form-control"
+                                   formControlName="differentLastName"
+                                   id="differentLastNameInput"
+                                   type="text">
+                        </div>
+
+                    </div>
+                </div>
+
+                <p class="card-text">
+                    Unterschreitet der Gesamtbetrag der Einkünfte (§ 2 Abs. 3 und 5a EStG) der/des Ehegattin/en
+                    bzw. der/des Lebenspartnerin/s den Betrag von 18.000 Euro?*
+                </p>
+
+                <div [ngClass]="{'is-invalid-radio': this.partnerTotalIncome.touched &&
+                                                     this.partnerTotalIncome.dirty &&
+                                                     this.partnerTotalIncome.invalid }">
+
+                    <tlrz-expanded-radio-btn formGroupName="partnerTotalIncome">
+                        <div class="form-check">
+                            <input id="partnerTotalIncomeRadio2"
+                                   name="partnerTotalIncome"
+                                   type="checkbox"
+                                   value="true"
+                                   class="form-check-input"
+                                   formControlName="preCurrentCalendarYear">
+                            <label class="form-check-label" for="partnerTotalIncomeRadio2">
+                                Ja, im Vorvorkalenderjahr der Antragstellung; der Steuerbescheid
+                            </label>
+
+                            <div [hidden]="!this.partnerTotalIncome.get('preCurrentCalendarYear').value"
+                                 class="form"
+                                 [formGroup]="applicantAndFundsGroup.get('partnerIncomeConfirmation')">
+
+                                <div class="form-check">
+                                    <input class="form-check-input"
+                                           formControlName="confirmation"
+                                           id="confirmationRadio2"
+                                           name="confirmation"
+                                           type="radio"
+                                           value="1">
+                                    <label class="form-check-label" for="confirmationRadio2"> liegt vor </label>
+                                </div>
+
+                                <div class="form-check">
+                                    <input class="form-check-input"
+                                           formControlName="confirmation"
+                                           id="confirmationRadio1"
+                                           name="confirmation"
+                                           type="radio"
+                                           value="2">
+                                    <label class="form-check-label" for="confirmationRadio1">
+                                        ist beigefügt
+                                    </label>
+
+                                    <small *ngIf="this.confirmation.touched &&
+                                              this.confirmation.dirty &&
+                                              this.confirmation.invalid &&
+                                              this.taxAssessmentFile.dirty"
+                                           class="invalid-input-small">
+                                        {{ this.errMsgService.getErrMsg(this.confirmation) }}
+                                    </small>
+                                </div>
+
+
+                                <div class="form-group">
+
+                                    <div class="custom-file">
+                                        <tlrz-file-upload (remove)="removeAssessmentFile()"
+                                                          [additionalValid]="this.confirmation.dirty"
+                                                          [removeButton]="true"
+                                                          formControlName="taxAssessmentFile"
+                                                          id="taxAssessmentFile" ariaLabel="Datei für den Steuerbescheid">
+                                        </tlrz-file-upload>
+
+                                        <small *ngIf="this.taxAssessmentFile.touched &&
+                                              this.taxAssessmentFile.dirty &&
+                                              this.taxAssessmentFile.invalid &&
+                                              this.confirmation.dirty"
+                                               class="invalid-input-small">
+                                            {{ this.errMsgService.getErrMsg(this.taxAssessmentFile) }}
+                                        </small>
+                                    </div>
+
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <div class="form-check">
+                            <input id="partnerTotalIncomeRadio1"
+                                   name="partnerTotalIncome"
+                                   type="checkbox"
+                                   value="true"
+                                   class="form-check-input"
+                                   formControlName="currentCalendarYear">
+                            <label class="form-check-label" for="partnerTotalIncomeRadio1">
+                                Ja, voraussichtlich im laufenden Kalenderjahr
+                            </label>
+                        </div>
+                    </tlrz-expanded-radio-btn>
+                </div>
+
+                <small *ngIf="this.partnerTotalIncome.touched &&
+                                  this.partnerTotalIncome.dirty &&
+                                  this.partnerTotalIncome.invalid"
+                       class="invalid-input-small">
+                    {{ errMsgService.getErrMsgByKey('requiredRadio') }}
+                </small>
+            </div>
+        </div>
+    </div>
+</form>

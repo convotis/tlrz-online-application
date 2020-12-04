@@ -1,0 +1,32 @@
+<div class="file-upload-list-el d-flex justify-content-between">
+
+    <a (click)="addField()" *ngIf="this.addButton"
+       class="file-upload-list-add" title="Eintrag hinzufügen" href="javascript:void(0);">
+        <img class="file-upload-add-img"
+            src="/o/tlrz-frontend-app/images/plus.svg"
+            alt=""
+        />
+    </a>
+
+    <div [class.file-upload-invalid]="control.touched && control.dirty && control.invalid && this.additionalValid"
+         class="file-upload-list-btn file-upload">
+        <span>{{ control.value ? control.value.name : "" }}</span>
+        <input #fileUpload
+               (click)="onTouched()"
+               class="file-upload-input"
+               id="file"
+               placeholder=""
+               type="file"
+               [attr.aria-label]="this.ariaLabel"
+        >
+    </div>
+
+    <a (click)="removeField()" [class.hide-button]="!this.removeButton"
+       class="file-upload-delete" title="Eintrag entfernen" href="javascript:void(0);">
+        <img class="file-upload-delete-img"
+             src="/o/tlrz-frontend-app/images/papierkorb.svg"
+             alt=""
+        />
+    </a>
+
+</div>

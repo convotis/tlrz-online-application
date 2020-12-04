@@ -1,0 +1,48 @@
+<form (submit)="openSubmitModal()" [formGroup]="applicantReactiveForm">
+
+    <app-applicant-and-funds [applicantAndFundsGroup]="this.applicantAndFundsGroup"></app-applicant-and-funds>
+
+    <app-services-usage [servicesUsageGroup]="this.servicesUsageGroup"></app-services-usage>
+
+    <app-total [amount]="this.amount" [filesCount]="this.filesCount"></app-total>
+
+    <app-services-table [applicantExpensesGroup]="this.applicantExpensesGroup"
+                        [applicantExpensesRadio]="this.applicantExpenses"
+                        [expensesForChildrenGroup]="this.expensesForChildrenGroup"
+                        [expensesForChildrenRadio]="this.expensesForChildren"
+                        [expensesForPartnerGroup]="this.expensesForPartnerGroup"
+                        [expensesForPartnerRadio]="this.expensesForPartner">
+    </app-services-table>
+
+    <!-- TODO: move to separate component -->
+    <div class="card">
+
+        <div class="card-body">
+
+            <div class="form-check">
+                <label class="form-check-label">
+                    <input class="form-check-input" formControlName="termsCheckbox" type="checkbox">
+                    Ich versichere die Richtigkeit der Angaben, die Grundlage für die Beihilfeberechtigung sind.
+                    Für die geltend gemachten Aufwendungen wurde bisher keine Beihilfe beantragt.
+                    Nachträgliche Preisermäßigungen oder Preisnachlässe sowie außervertragliche Leistungen für die
+                    geltend gemachten Aufwendungen (Kosten) werde ich sofort der Beihilfestelle anzeigen.
+                </label>
+
+                <div *ngIf="this.applicantReactiveForm.get('termsCheckbox').touched &&
+                              this.applicantReactiveForm.get('termsCheckbox').invalid"
+                       class="invalid-input-small">
+                    <small>{{ errMsgService.getErrMsgByKey('requiredRadio') }}</small>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <div>
+        <tlrz-previos-next-btn (previous)="return()"
+                               nextLabel="Absenden">
+        </tlrz-previos-next-btn>
+    </div>
+
+</form>

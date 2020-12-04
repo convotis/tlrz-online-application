@@ -1,0 +1,22 @@
+<form (submit)="submit()" [formGroup]="applicantAndFundsGroup" class="custom-form">
+
+    <tlrz-applicant-details [applicantAndFundsGroup]="applicantAndFundsGroup"></tlrz-applicant-details>
+
+    <alert type="info">
+        Bei erstmaliger Antragstellung oder auf Verlangen der Beihilfestelle ist nicht der Kurzantrag auf Beihilfe,
+        sondern der vollständige Antrag auf Beihilfe zu verwenden.
+    </alert>
+
+    <tlrz-funds-details [applicantAndFundsGroup]="applicantAndFundsGroup"></tlrz-funds-details>
+
+    <small *ngIf="this.showSubmitError"
+           class="invalid-input-small is-invalid-section-label is-bottom-label">
+        {{ this.errMsgService.getErrMsg(this.applicantAndFundsGroup) }}
+    </small>
+
+    <div>
+        <tlrz-previos-next-btn (previous)="openReturnModal()">
+        </tlrz-previos-next-btn>
+    </div>
+
+</form>

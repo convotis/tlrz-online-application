@@ -1,0 +1,130 @@
+<form [formGroup]="applicantAndFundsGroup" autocomplete="off">
+
+    <div class="card">
+
+        <div class="card-body">
+
+            <div class="row">
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="lastNameInput"
+                               [class.disabled]="applicantAndFundsGroup.get('lastName').disabled">
+                            Name
+                        </label>
+                        <input class="form-control"
+                               formControlName="lastName"
+                               id="lastNameInput"
+                               type="text">
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="birthdayInput"
+                               [class.disabled]="applicantAndFundsGroup.get('birthday').disabled">
+                            Geburtsdatum*
+                        </label>
+                        <tlrz-display-date [delimiter]="'.'"
+                                           formControlName="birthday"
+                                           labelledBy="birthdayInput">
+                        </tlrz-display-date>
+
+                        <small *ngIf="applicantAndFundsGroup.get('birthday').touched &&
+                          applicantAndFundsGroup.get('birthday').dirty &&
+                          applicantAndFundsGroup.get('birthday').invalid"
+                               class="invalid-input-small">
+                            {{ this.errMsgService.getErrMsg(applicantAndFundsGroup.get('birthday')) }}
+                        </small>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="row">
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="firstNameInput"
+                               [class.disabled]="applicantAndFundsGroup.get('firstName').disabled">
+                            Vorname
+                        </label>
+                        <input autocomplete="off"
+                               class="form-control"
+                               formControlName="firstName"
+                               id="firstNameInput"
+                               type="text">
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="personalNumberInput"
+                               [class.disabled]="applicantAndFundsGroup.get('personalNumber').disabled">
+                            Personalnummer*
+                        </label>
+                        <input [ngClass]="{'is-invalid': this.personalNumber.touched &&
+                                                         this.personalNumber.dirty &&
+                                                         this.personalNumber.invalid }"
+                               autocomplete="off"
+                               class="form-control"
+                               formControlName="personalNumber"
+                               id="personalNumberInput"
+                               type="text">
+                        <small *ngIf="this.personalNumber.touched &&
+                                      this.personalNumber.dirty &&
+                                      this.personalNumber.invalid"
+                               class="invalid-input-small">
+                            {{ errMsgService.getErrMsg(this.personalNumber) }}
+                        </small>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="row">
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="privatePhoneInput"
+                               [class.disabled]="applicantAndFundsGroup.get('privatePhone').disabled">
+                            Telefon privat (freiwillige Angabe)
+                        </label>
+                        <input autocomplete="off"
+                               class="form-control"
+                               formControlName="privatePhone"
+                               id="privatePhoneInput"
+                               type="text">
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="privateEmailInput"
+                               [class.disabled]="applicantAndFundsGroup.get('privateEmail').disabled">
+                            E-Mail privat (freiwillige Angabe)
+                        </label>
+                        <input [ngClass]="{'is-invalid': this.privateEmail.touched &&
+                                                         this.privateEmail.dirty &&
+                                                         this.privateEmail.invalid }"
+                               autocomplete="off"
+                               class="form-control"
+                               formControlName="privateEmail"
+                               id="privateEmailInput"
+                               type="email"
+                        >
+
+                        <small *ngIf="this.privateEmail.touched &&
+                                      this.privateEmail.dirty &&
+                                      this.privateEmail.invalid"
+                               class="invalid-input-small">
+                            {{ errMsgService.getErrMsg(this.privateEmail) }}
+                        </small>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</form>

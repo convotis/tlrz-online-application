@@ -1,0 +1,162 @@
+<div class="card">
+
+    <div class="card-body">
+
+        <h2 class="card-title"><strong> Angaben des Antragstellers</strong></h2>
+
+        <div class="row">
+
+            <div class="col-md-6">
+                <div class="form-group">
+                    <input aria-describedby="lastNameLabel"
+                           class="form-control"
+                           disabled
+                           type="text"
+                           value="{{lastName.value}}">
+                    <small id="lastNameLabel"> Name </small>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="form-group">
+                    <input aria-describedby="birthdayLabel"
+                           class="form-control"
+                           disabled
+                           type="text"
+                           value="{{millisToDate(birthday.value)}}">
+                    <small id="birthdayLabel"> Geburtsdatum </small>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="row">
+
+            <div class="col-md-6">
+                <div class="form-group">
+                    <input aria-describedby="firstNameLabel"
+                           class="form-control"
+                           disabled
+                           type="text"
+                           value="{{firstName.value}}">
+                    <small id="firstNameLabel"> Vorname </small>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="form-group">
+                    <input aria-describedby="personalNumberLabel"
+                           class="form-control"
+                           disabled
+                           type="text"
+                           value="{{personalNumber.value}}">
+                    <small id="personalNumberLabel"> Personalnummer </small>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="row">
+
+            <div class="col-md-6">
+                <div class="form-group">
+                    <input aria-describedby="privatePhoneLabel"
+                           class="form-control"
+                           disabled
+                           type="text"
+                           value="{{privatePhone.value}}">
+                    <small id="privatePhoneLabel"> Telefon privat </small>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="form-group">
+                    <input aria-describedby="privateEmailLabel"
+                           class="form-control"
+                           disabled
+                           type="email"
+                           value="{{privateEmail.value}}">
+                    <small id="privateEmailLabel"> E-Mail privat </small>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- TODO: move magic numbers to enum -->
+        <p *ngIf="applicantExpenses.value == 'true'" class="card-text">
+            <strong>Ja</strong>, es sollen Aufwendungen für den Antragsteller geltend gemacht werden.
+        </p>
+
+        <p *ngIf="applicantExpenses.value == 'false'" class="card-text">
+            <strong>Nein</strong>, es sollen keine Aufwendungen für den Antragsteller geltend gemacht werden.
+        </p>
+
+        <p *ngIf="expensesForChildren.value == 'true'" class="card-text">
+            <strong>Ja</strong>, es sollen Aufwendungen für Kinder gemacht werden.
+        </p>
+
+        <p *ngIf="expensesForChildren.value == 'false'" class="card-text">
+            <strong>Nein</strong>, es sollen keine Aufwendungen für Kinder gemacht werden.
+        </p>
+
+        <div *ngIf="expensesForPartner.value == 'true'">
+
+            <p class="card-text">
+                <strong>Ja</strong>, es sollen Aufwendungen für den/die Ehegatten/in oder Lebenspartner/in
+                (nach § 1 LPartG) geltend gemacht werden:
+            </p>
+
+            <div class="row">
+                <div class="col-md-6">
+
+                    <div class="form-group">
+                        <input aria-describedby="nameAndSurname"
+                               autocomplete="off"
+                               class="form-control"
+                               disabled
+                               type="text"
+                               value="{{ partnerFirstName.value
+                                         + ' ' +
+                                         (differentLastName.value ? differentLastName.value : '') }}">
+                        <small id="nameAndSurname">
+                            Vor- und Nachname, ggf. abweichender Familienname
+                        </small>
+                    </div>
+
+                </div>
+            </div>
+
+            <p *ngIf="partnerTotalIncome.get('preCurrentCalendarYear').value && confirmation.value == '1'">
+                <strong>Ja</strong>, der Gesamtbetrag der Einkünfte (§ 2 Abs. 3 und 5a EStG) der/des Ehegattin/en bzw.
+                der/des Lebenspartnerin/s unterschreitet den Betrag von 18.000 Euro <strong>im Vorvorkalenderjahr
+                der Antragstellung</strong>. Der <strong>Steuerbescheid liegt vor</strong>.
+            </p>
+
+            <p *ngIf="partnerTotalIncome.get('preCurrentCalendarYear').value && confirmation.value == '2'">
+                <strong>Ja</strong>, der Gesamtbetrag der Einkünfte (§ 2 Abs. 3 und 5a EStG) der/des Ehegattin/en bzw. der/des
+                Lebenspartnerin/s unterschreitet den Betrag von 18.000 Euro <strong>im Vorvorkalenderjahr der Antragstellung</strong>.
+                Der <strong>Steuerbescheid</strong> ist <strong>beigefügt</strong>.
+            </p>
+
+            <p *ngIf="partnerTotalIncome.get('currentCalendarYear').value">
+                <strong>Ja</strong>, der Gesamtbetrag der Einkünfte (§ 2 Abs. 3 und 5a EStG) der/des Ehegattin/en bzw. der/des
+                Lebenspartnerin/s unterschreitet den Betrag von 18.000 Euro <strong>voraussichtlich im laufenden Kalenderjahr</strong>.
+            </p>
+
+            <p *ngIf="((!partnerTotalIncome.get('preCurrentCalendarYear').value) && (!partnerTotalIncome.get('currentCalendarYear').value))">
+                <strong>Nein</strong>, der Gesamtbetrag der Einkünfte (§ 2 Abs. 3 und 5a EStG) der/des Ehegattin/en bzw. der/des
+                Lebenspartnerin/s unterschreitet nicht den Betragvon 18.000 Euro.
+            </p>
+
+        </div>
+
+        <!-- TODO: move magic numbers to enum -->
+        <p *ngIf="expensesForPartner.value == 'false'" class="card-text">
+            <strong>Nein</strong>, es sollen keine Aufwendungen für den/die Ehegatten/in oder
+            Lebenspartner/in (nach § 1 LPartG) geltend gemacht werden.
+        </p>
+
+    </div>
+
+</div>
+

@@ -1,0 +1,15 @@
+<div class="d-flex justify-content-between previous-next">
+    <div>
+        <button (click)="previousBtn()" class="btn btn-primary custom-button" type="button">
+            <span class="icon icon-arrow-left" aria-hidden="true"></span> Zurück
+        </button>
+    </div>
+    <div>
+        <button (click)="nextBtn()"
+                [disabled]="disabledNextBtn"
+                class="btn btn-primary custom-button"
+                type="submit">
+            {{ this.nextLabel ? this.nextLabel : 'Weiter' }} <span class="icon icon-arrow-right" aria-hidden="true"></span>
+        </button>
+    </div>
+</div>

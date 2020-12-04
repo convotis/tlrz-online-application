@@ -1,0 +1,117 @@
+<form [formGroup]="servicesUsageGroup">
+
+    <div class="card">
+
+        <div class="card-body">
+
+            <p>
+                Werden Aufwendungen für Krankheiten, für die Versicherungsleistungen
+                ausgeschlossen oder eingestellt worden sind, geltend gemacht?*
+            </p>
+
+            <div class="d-flex justify-content-between previous-next">
+                <div [ngClass]="{'is-invalid-radio': this.illnessExpenses.touched &&
+                                                     this.illnessExpenses.dirty &&
+                                                     this.illnessExpenses.invalid }">
+
+                    <div class="form-check">
+                        <input (click)="this.setListControlsValidators()"
+                               class="form-check-input"
+                               formControlName="illnessExpenses"
+                               id="illnessExpensesRadio1"
+                               name="illnessExpenses"
+                               type="radio"
+                               value="true">
+                        <label class="form-check-label" for="illnessExpensesRadio1">
+                            Ja, für folgende Person(en):
+                        </label>
+
+                        <div [hidden]="this.illnessExpenses.value != 'true'"
+                             class="form form-group">
+
+                            <div *ngFor="let group of this.illnessPersonList.controls; let personIndex = index;"
+                                 formArrayName="illnessPersonList">
+
+                                <div formGroupName="{{personIndex}}">
+
+                                    <label for="illnessPersonItem{{personIndex}}">
+                                        <small> Vor- und Nachname(n) </small>
+                                    </label>
+
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <button (click)="addToList(personIndex + 1)"
+                                                    class="delete-file-button"
+                                                    type="button"
+                                                    title="Eintrag hinzufügen"
+                                            >
+                                                <img class="close-icon" src="/o/tlrz-frontend-app/images/plus.svg" alt=""/>
+                                            </button>
+                                        </div>
+
+                                        <input class="form-control"
+                                               formControlName="person"
+                                               id="illnessPersonItem{{personIndex}}"
+                                               type="text">
+
+                                        <div class="input-group-append">
+                                            <button (click)="removeFromList(personIndex)"
+                                                    class="delete-file-button"
+                                                    type="button"
+                                                    title="Eintrag entfernen"
+                                                    [class.hide-button]="this.illnessPersonList.length <= 1"
+                                            >
+                                                <img class="close-icon"
+                                                     src="/o/tlrz-frontend-app/images/papierkorb.svg" alt=""/>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <small *ngIf="group.get('person').touched &&
+                                                  group.get('person').dirty &&
+                                                  group.get('person').invalid"
+                                           class="invalid-input-small">
+                                        {{ this.errMsgService.getErrMsg(group.get('person')) }}
+                                    </small>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-check">
+                        <input (click)="this.removeListControlsValidators()"
+                               class="form-check-input"
+                               formControlName="illnessExpenses"
+                               id="illnessExpensesRadio0"
+                               name="illnessExpenses"
+                               type="radio"
+                               value="false">
+                        <label class="form-check-label" for="illnessExpensesRadio0"> Nein </label>
+                    </div>
+
+                </div>
+
+                <div [hidden]="this.illnessExpenses.value != 'true'">
+                    <div [isOpen]="true"
+                         class="card-text"
+                         containerClass="bs-tooltip-container-relative"
+                         placement="bottom"
+                         tooltip="Belege bitte vor dem Scannen kennzeichnen und Nachweis
+                                  – Versicherungsschein über Ausschluss usw. – beifügen"
+                         triggers="">
+                    </div>
+                </div>
+            </div>
+
+            <small *ngIf="this.illnessExpenses.touched &&
+                              this.illnessExpenses.dirty &&
+                              this.illnessExpenses.invalid"
+                   class="invalid-input-small">
+                {{ errMsgService.getErrMsgByKey('chooseRadio') }}
+            </small>
+        </div>
+
+    </div>
+
+</form>

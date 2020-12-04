@@ -1,0 +1,40 @@
+<div class="d-flex">
+
+    <input #dayInput
+           id="{{ this.labelledBy }}"
+           (change)="changeDate($event)"
+           (click)="onTouched()"
+           [class.is-invalid]="control.touched && control.dirty && control.invalid"
+           [disabled]="this.isDisabled"
+           class="form-control input-small text-center"
+           maxlength="2"
+           type="text"
+           aria-label="Tag"
+           value="{{ this.date.day }}">
+
+    <span class="delimiter">{{this.delimiter}}</span>
+
+    <input #monthInput
+           (change)="changeMonth($event)"
+           (click)="onTouched()"
+           [class.is-invalid]="control.touched && control.dirty && control.invalid"
+           [disabled]="this.isDisabled"
+           class="form-control input-small text-center"
+           maxlength="2"
+           type="text"
+           aria-label="Monat"
+           value="{{ this.date.month }}">
+
+    <span class="delimiter">{{this.delimiter}}</span>
+
+    <input #yearInput
+           (change)="changeYear($event)"
+           (click)="onTouched()"
+           [class.is-invalid]="control.touched && control.dirty && control.invalid"
+           [disabled]="this.isDisabled"
+           class="form-control input-medium text-center"
+           maxlength="4"
+           type="text"
+           aria-label="Jahr"
+           value="{{ this.date.year }}">
+</div>

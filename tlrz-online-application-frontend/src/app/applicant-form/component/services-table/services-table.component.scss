@@ -1,0 +1,78 @@
+::ng-deep {
+
+    .datatable-scroll {
+        width: auto !important;
+    }
+
+    .datatable-row-wrapper {
+        width: auto !important;
+    }
+
+    .datatable-group-header {
+        width: auto !important;
+    }
+
+    datatable-body-cell {
+        overflow-x: visible !important;
+    }
+
+    .datatable-body-cell-label {
+        white-space: nowrap;
+    }
+
+    .file-label {
+        overflow: hidden;
+    }
+
+    .summary-table-header,
+    .summary-table-cell .datatable-body-cell-label {
+        padding: 5px;
+        white-space: initial;
+        word-break: break-all;
+        overflow: visible;
+    }
+    .summary-table-total-label {
+        position: absolute;
+        bottom: 10px;
+    }
+
+    .datatable-row-wrapper {
+        margin-bottom: 15px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid #ccc;
+    }
+
+    .datatable-group-header {
+        font-weight: bold;
+    }
+
+    .ag-theme-balham {
+        width: 100%;
+        height: 300px;
+    }
+
+    .row-group-cell {
+        padding: 0 !important;
+    }
+
+    .cell-text {
+        white-space: normal;
+    }
+
+    .summary-table.ag-theme-balham {
+        height: 100%;
+    }
+
+    .summary-table-total {
+        font-weight: bold;
+
+        .ag-body-viewport.ag-layout-normal.ag-row-no-animation {
+            overflow: hidden;
+        }
+
+        .ag-cell {
+            white-space: nowrap;
+            overflow: visible;
+        }
+    }
+}

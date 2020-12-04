@@ -1,0 +1,32 @@
+<div class="card">
+
+    <div class="card-body">
+
+        <h2 class="card-title"><strong> Zusammenstellung der Antragsdaten </strong></h2>
+
+        <div class="row">
+
+            <div class="col-md-6">
+                <div class="form-group">
+                    <input [value]="filesCount | async"
+                           aria-describedby="filesCount"
+                           class="form-control"
+                           disabled>
+                    <small id="filesCount"> Anzahl der beigefügten Dateien </small>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="form-group">
+                    <input *ngIf="amount"
+                           [value]="amount | async"
+                           aria-describedby="amount"
+                           class="form-control"
+                           disabled>
+                    <small id="amount"> Antragssumme </small>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>

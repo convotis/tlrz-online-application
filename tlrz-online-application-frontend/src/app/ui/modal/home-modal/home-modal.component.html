@@ -1,0 +1,56 @@
+<div class="modal-header modal-custom-header">
+
+    <h1> Kurzantrag auf Beihilfe </h1>
+
+    <button (click)="bsModalRef.hide()" class="close modal-close-button" title="Schließen" type="button">
+        <img class="close-icon" src="/o/tlrz-frontend-app/images/close-24px.svg" alt="" />
+    </button>
+
+</div>
+
+<div class="modal-body modal-custom-body">
+
+    <p class="text-justify">
+        Bei erstmaliger Antragstellung oder auf Verlangen der Beihilfestelle ist nicht dieser „Kurzantrag auf Beihilfe“,
+        sondern der „Antrag auf Beihilfe“ zu verwenden.
+    </p>
+
+    <p class="text-justify">
+        Haben sich bei folgenden unter den Nummern 2, 3, 5 und 10 des letzten Antrages auf Beihilfe Änderungen ergeben
+        und/oder sollen Aufwendungen, die im Zusammenhang mit einem Unfall oder anderen schädigenden Ereignis stehen,
+        geltend gemacht werden, dann ist nicht dieser „Kurzantrag auf Beihilfe“, sondern der „Antrag auf Beihilfe“ zu verwenden.
+    </p>
+
+    <p class="text-center">
+        Weitere Informationen zu Beihilfeangelegenheiten finden Sie unter <br>
+
+        <a (click)="openLinkNewTab(this.informationAboutGrantLink)" class="modal-custom-link">
+            {{this.informationAboutGrantLink}}
+        </a>
+    </p>
+
+    <div class="button-wrapper">
+        <button (click)="navigateToApplicantForm()" class="btn btn-primary"> Zum Online-Kurzantrag auf Beihilfe</button>
+
+        <a (click)="openLinkNewTab(this.toTheOnlineApplicationLink)">
+            <button class="btn btn-primary modal-button-link"> Zum Antrag auf Beihilfe</button>
+        </a>
+    </div>
+
+</div>
+
+<div class="modal-footer modal-custom-footer">
+
+    <p class="text-justify">
+        Informationen zum Datenschutz sind der im Internet unter
+
+        <a (click)="openLinkNewTab(this.privacyInformationLink)" class="modal-custom-link">
+            {{this.privacyInformationLink}}
+        </a>
+
+        eingestellten Bediensteten-Information zur Beihilfestelle zu entnehmen, die auf Verlangen auch versandt wird.
+    </p>
+
+</div>
+
+

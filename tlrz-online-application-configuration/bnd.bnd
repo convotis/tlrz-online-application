@@ -1,0 +1,6 @@
+Bundle-Name: Configuration
+Bundle-SymbolicName: de.xdot.configuration
+Bundle-Version: 1.0.0
+Export-Package: de.xdot.configuration
+Import-Package: *
+-metatype: *
