@@ -1,0 +1,74 @@
+.file-upload {
+    position: relative;
+    padding: 0.375rem 0.75rem;
+    border: 1px solid #767676;
+    border-radius: 0.25rem;
+
+    &::after {
+        content: "Datei auswählen";
+        position: absolute;
+        display: block;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 3;
+        padding: 0.375rem 0.75rem;
+        background-color: #0089c1;
+        border: none;
+        border-radius: 0;
+        border-left: 1px solid #767676;
+        color: white;
+    }
+}
+
+.file-upload:focus-within {
+    color: #000;
+    background-color: #fff;
+    border-color: #0565a9;
+    outline: 0;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.file-upload-invalid {
+    border-color: red;
+}
+
+.file-upload-input {
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 100%;
+    opacity: 0;
+    z-index: 5;
+
+    &:hover {
+        cursor: pointer;
+    }
+}
+
+.file-upload-list-el {
+    margin: 15px 0;
+}
+
+.file-upload-list-add,
+.file-upload-delete {
+    display: block;
+    &:hover {
+        cursor: pointer;
+    }
+}
+
+.file-upload-add-img,
+.file-upload-delete-img {
+    width: 35px;
+}
+
+.file-upload-list-btn {
+    width: 100%;
+    margin: 0 15px;
+}
+
+.hide-button {
+    visibility: hidden;
+}

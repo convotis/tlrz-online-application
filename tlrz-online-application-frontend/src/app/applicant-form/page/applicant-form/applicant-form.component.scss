@@ -1,0 +1,61 @@
+$wizardColor: #0089c1;
+
+.form-holder {
+    > div {
+        overflow: hidden;
+    }
+}
+
+.applicant-form {
+    padding: 35px;
+    background-color: #ebebeb;
+
+    h1 {
+        color: #0089c1;
+        margin-bottom: 20px;
+    }
+}
+
+::ng-deep aw-wizard.custom-wizard {
+
+    aw-wizard-navigation-bar.horizontal ul.steps-indicator  {
+        padding-bottom: 30px;
+
+        li {
+            margin-right: 10px;
+
+            &:last-child {
+                margin-right: 0;
+            }
+        }
+
+        li a .label {
+            display: flex;
+            height: 100%;
+            min-height: 70px;
+            padding: 0 10px;
+
+            justify-content: center;
+            align-items: center;
+            border: 2px solid $wizardColor;
+            font-size: 15px;
+            font-family: Arial, sans-serif;
+            font-weight: normal;
+            color: $wizardColor;
+            word-break: break-word;
+        }
+
+        li:last-child a .label {
+            margin-right: 0;
+        }
+
+        li.current a .label {
+            background-color: $wizardColor;
+            color: white;
+        }
+
+        li a .label {
+            background-color: white;
+        }
+    }
+}

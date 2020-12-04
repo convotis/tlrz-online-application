@@ -1,0 +1,5 @@
+Web-ContextPath: /tlrz-frontend-app
+Liferay-JS-Config: /config.js
+
+-metatype:*
+

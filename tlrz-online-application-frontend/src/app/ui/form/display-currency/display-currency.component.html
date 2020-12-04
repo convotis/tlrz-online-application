@@ -1,0 +1,33 @@
+<div class="d-flex">
+
+    <input #euroInput
+           id="{{ this.labelledBy }}"
+           (click)="onTouched()"
+           (change)="changeEuro($event)"
+           (focus)="onFocus($event)"
+           (blur)="onBlur($event)"
+           [class.is-invalid]="control.touched && control.dirty && control.invalid"
+           class="form-control input-large text-center"
+           maxlength="6"
+           type="text"
+           value="{{ this.euro }}"
+           aria-label="Euro"
+    >
+
+    <span class="delimiter">{{this.delimiter}}</span>
+
+    <input #centInput
+           (change)="changeCent($event)"
+           (click)="onTouched()"
+           [class.is-invalid]="control.touched && control.dirty && control.invalid"
+           class="form-control input-small text-center"
+           maxlength="2"
+           type="text"
+           value="{{ this.cent }}"
+           aria-label="Cent"
+    >
+
+    <span class="euro">€</span>
+
+</div>
+

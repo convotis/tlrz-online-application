@@ -1,0 +1,65 @@
+<div class="row form-holder">
+    <div>
+        <div class="applicant-form">
+
+            <h1> Online-Kurzantrag auf Beihilfe </h1>
+
+            <aw-wizard [awNavigationMode] navigateBackward="allow" navigateForward="allow"
+                       [disableNavigationBar]="true"
+                       [navBarLayout]="''"
+                       [navBarLocation]="'top'"
+                       class="custom-wizard">
+
+                <aw-wizard-step stepTitle="Angaben des Antrag&shy;stellers">
+                    <tlrz-applicant-and-funds [applicantAndFundsGroup]="applicantAndFundsGroup"
+                                              [wizard]="wizard">
+                    </tlrz-applicant-and-funds>
+                </aw-wizard-step>
+
+                <aw-wizard-step stepTitle="Weitere Angaben des Antrag&shy;stellers">
+                    <tlrz-services-usage [servicesUsageGroup]="servicesUsageGroup"
+                                         [wizard]="wizard">
+                    </tlrz-services-usage>
+                </aw-wizard-step>
+
+                <aw-wizard-step *ngIf="applicantExpensesRadio.value == 'true'"
+                                awOptionalStep
+                                stepTitle="Aufwen&shy;dungen des Antrag&shy;stellers">
+                    <tlrz-applicant-expenses [applicantExpensesGroup]="applicantExpensesGroup"
+                                             [expensesForPartnerGroup]="expensesForPartnerGroup"
+                                             [expensesForChildrenGroup]="expensesForChildrenGroup"
+                                             [wizard]="wizard">
+                    </tlrz-applicant-expenses>
+                </aw-wizard-step>
+
+                <aw-wizard-step *ngIf="expensesForPartnerRadio.value == 'true'"
+                                awOptionalStep
+                                stepTitle="Aufwen&shy;dungen für Ehe&shy;gatte/in bzw. Lebens&shy;part&shy;ner/in">
+                    <tlrz-expenses-for-partner [applicantExpensesGroup]="applicantExpensesGroup"
+                                               [expensesForPartnerGroup]="expensesForPartnerGroup"
+                                               [expensesForChildrenGroup]="expensesForChildrenGroup"
+                                               [wizard]="wizard">
+                    </tlrz-expenses-for-partner>
+                </aw-wizard-step>
+
+                <aw-wizard-step *ngIf="expensesForChildrenRadio.value == 'true'"
+                                awOptionalStep
+                                stepTitle="Aufwen&shy;dungen für Kinder">
+                    <tlrz-expenses-for-children [applicantExpensesGroup]="applicantExpensesGroup"
+                                                [expensesForPartnerGroup]="expensesForPartnerGroup"
+                                                [expensesForChildrenGroup]="expensesForChildrenGroup"
+                                                [wizard]="wizard">
+                    </tlrz-expenses-for-children>
+                </aw-wizard-step>
+
+                <aw-wizard-step stepTitle="Zu&shy;sammen&shy;fassung">
+                    <tlrz-summary [applicantReactiveForm]="applicantReactiveForm"
+                                  [wizard]="wizard">
+                    </tlrz-summary>
+                </aw-wizard-step>
+
+            </aw-wizard>
+
+        </div>
+    </div>
+</div>

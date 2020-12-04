@@ -1,0 +1,72 @@
+<div [formGroup]="parentGroup">
+    <div *ngFor="let fileAndType of this.files.controls; let fileIndex=index"
+         formArrayName="files">
+
+        <div class="file-type-field" formGroupName="{{fileIndex}}">
+
+            <div class="col-md-9 margin-v-15 file-input">
+                <tlrz-file-upload
+                    (add)="addFileToFileArray(this.files, fileIndex + 1)"
+                    (remove)="removeFileFromFileArray(this.files, fileIndex)"
+                    [addButton]="true"
+                    [removeButton]="this.files.length > 1"
+                    formControlName="file"
+                    ariaLabel="Datei für den Beleg"
+                >
+                </tlrz-file-upload>
+
+                <small *ngIf="this.fileAndType.get('file').touched &&
+                              this.fileAndType.get('file').dirty &&
+                              this.fileAndType.get('file').invalid"
+                       class="invalid-input-small">
+                    {{ this.errMsgService.getErrMsg(this.fileAndType.get('file')) }}
+                </small>
+            </div>
+
+            <div>
+                <div [ngClass]="{'is-invalid-radio': this.fileAndType.get('type').touched &&
+                                                     this.fileAndType.get('type').dirty &&
+                                                     this.fileAndType.get('type').invalid }">
+
+                    <strong>
+                        Dokumententyp*
+                    </strong>
+
+                    <div class="form-check">
+                        <input class="form-check-input"
+                               formControlName="type"
+                               id="{{this.uniqueId}}UploadedFileType{{fileIndex}}_1"
+                               type="radio"
+                               value="1">
+                        <label class="form-check-label"
+                               for="{{this.uniqueId}}UploadedFileType{{fileIndex}}_1">
+                            Rechnung
+                        </label>
+                    </div>
+
+                    <div class="form-check">
+                        <input class="form-check-input"
+                               formControlName="type"
+                               id="{{this.uniqueId}}UploadedFileType{{fileIndex}}_2"
+                               type="radio"
+                               value="2">
+                        <label class="form-check-label"
+                               for="{{this.uniqueId}}UploadedFileType{{fileIndex}}_2">
+                            Rezept
+                        </label>
+                    </div>
+
+                </div>
+
+                <small *ngIf="this.fileAndType.get('type').touched &&
+                                      this.fileAndType.get('type').dirty &&
+                                      this.fileAndType.get('type').invalid"
+                       class="invalid-input-small">
+                    {{ this.errMsgService.getErrMsg(this.fileAndType.get('type')) }}
+                </small>
+            </div>
+        </div>
+
+
+    </div>
+</div>

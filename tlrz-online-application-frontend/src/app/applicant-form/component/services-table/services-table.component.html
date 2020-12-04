@@ -1,0 +1,21 @@
+<div class="card">
+
+    <div class="card-body">
+
+        <h2 class="card-title"><strong> Aufwendungen </strong></h2>
+
+        <ag-grid-angular
+            #summaryGrid
+            class="ag-theme-balham summary-table"
+            [domLayout]="'autoHeight'"
+            [defaultColDef]="defaultColDef"
+            [columnDefs]="columnDefs"
+            (gridReady)="onGridReady($event)"
+            (columnResized)="onColumnResized()"
+            [getRowHeight]="getRowHeight"
+        >
+        </ag-grid-angular>
+
+    </div>
+
+</div>

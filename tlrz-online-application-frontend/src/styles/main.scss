@@ -1,0 +1,168 @@
+::ng-deep{
+
+    @import "node_modules/angular-archwizard/archwizard.scss";
+
+    tlrz-submit-form-app, modal-container {
+
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        h1 {
+            font-size: 30px;
+        }
+
+        h2 {
+            font-size: 24px;
+        }
+
+        h4 {
+            font-size: 20px;
+        }
+
+        p {
+            font-size: 15px;
+        }
+
+        small {
+            font-size: 13px;
+        }
+
+        button {
+            background-color: #0089c1;
+            color: white;
+            font-size: 15px;
+        }
+
+        a {
+            font-size: 15px;
+            text-decoration: underline;
+            color: black;
+        }
+
+        a:hover {
+            font-size: 15px;
+            text-decoration: underline;
+            color: #0089c1;
+        }
+    }
+
+    .modal {
+        background-color: transparent;
+    }
+
+    .modal-backdrop {
+        opacity: .5 !important;
+    }
+
+    .modal-dialog {
+        position: relative;
+        max-width: 550px;
+    }
+
+
+    modal-container.modal.fade.show {
+        .return-modal.modal-dialog {
+            position: relative;
+            top: 50%;
+            transform: translateY(-50%);
+            max-width: 850px;
+
+            .modal-content {
+                background-color: #FEE4C9;
+                padding-bottom: 20px;
+
+                .modal-header, .modal-body, .modal-footer {
+                    border: none;
+                }
+
+                .modal-header {
+                    height: 40px;
+                    padding: 0;
+                    justify-content: flex-end;
+
+                    .close.pull-right {
+                        padding-right: 3rem;
+                        padding-top: 24px;
+                        opacity: 1;
+
+                        img {
+                            background-color: #A66201;
+                        }
+
+                    }
+                }
+
+                .modal-body {
+                    text-align: center;
+                    color: #7f523d;
+                }
+
+                .modal-footer {
+                    justify-content: center;
+
+                    button {
+                        opacity: 1;
+                        border: none;
+                        background-color: #A66201;
+                    }
+                }
+            }
+        }
+    }
+
+    .is-invalid-radio {
+        border: 1px solid red;
+    }
+
+    .invalid-input-small {
+        color: red;
+    }
+
+    .is-invalid-label {
+        border-color: red;
+    }
+
+    .is-invalid-section-label {
+        float: right;
+    }
+
+    .is-bottom-label {
+        padding-bottom: 10px;
+    }
+
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    .custom-button {
+        min-width: 150px;
+
+        margin: 0 auto;
+    }
+
+    .delete-file-button {
+        border: none;
+        background-color: transparent;
+
+        img {
+            width: 35px;
+        }
+
+        &:hover {
+            cursor: pointer;
+        }
+    }
+
+    .delimiter {
+        align-self: flex-end;
+        margin-left: 5px;
+        margin-right: 5px;
+    }
+
+    .card-title {
+        margin-bottom: 0.75em;
+    }
+}

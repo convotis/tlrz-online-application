@@ -1,0 +1,14 @@
+<ng-content></ng-content>
+
+<div class="form-check">
+    <label class="form-check-label">
+        <input class="form-check-input"
+               type="radio"
+               name="partnerTotalIncome"
+               [(ngModel)]="radioBtn"
+               [checked]="radioBtn"
+               [value]="true"
+               (click)="clearAll()">
+        Nein
+    </label>
+</div>

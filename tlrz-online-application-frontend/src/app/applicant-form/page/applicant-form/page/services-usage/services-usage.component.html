@@ -1,0 +1,19 @@
+<form (submit)="submit()" [formGroup]="servicesUsageGroup" class="custom-form">
+
+    <tlrz-activity-expenses [servicesUsageGroup]="servicesUsageGroup"></tlrz-activity-expenses>
+
+    <tlrz-illness-expenses [servicesUsageGroup]="servicesUsageGroup"></tlrz-illness-expenses>
+
+    <tlrz-insurance-benefits [servicesUsageGroup]="servicesUsageGroup"></tlrz-insurance-benefits>
+
+    <small *ngIf="this.showSubmitError"
+           class="invalid-input-small is-invalid-section-label is-bottom-label">
+        {{ this.errMsgService.getErrMsg(this.servicesUsageGroup) }}
+    </small>
+
+    <div>
+        <tlrz-previos-next-btn (previous)="return()">
+        </tlrz-previos-next-btn>
+    </div>
+
+</form>

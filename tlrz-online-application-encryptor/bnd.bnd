@@ -1,0 +1,6 @@
+Bundle-Name: PGP Encryptor
+Bundle-SymbolicName: de.xdot.encryptor
+Bundle-Version: 1.0.0
+Export-Package: \
+    de.xdot.encryptor.service
+

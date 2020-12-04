@@ -1,0 +1,108 @@
+<div class="card">
+
+    <div class="card-body">
+
+        <h2 class="card-title"><strong> Weitere Angaben des Antragstellers </strong></h2>
+
+        <div *ngIf="this.activityExpenses.value == 'true'">
+
+            <p class="card-text">
+                <strong>Ja</strong>, es werden Aufwendungen für die persönliche Tätigkeit
+                (als Arzt, Zahnarzt, Heilpraktiker, Physiotherapeut usw.) eines
+                nahen Angehörigen (Ehegatte/in, Lebenspartner/in, Eltern, Kinder
+                der behandelnden Person) für folgende Personen geltend gemacht:
+            </p>
+
+            <div *ngFor="let group of this.activityPersonList.controls; let i = index" class="row">
+                <div class="col-md-6">
+
+                    <div class="form-group">
+                        <input autocomplete="off"
+                               class="form-control"
+                               disabled
+                               type="text"
+                               value="{{ group.get('person').value }}">
+                        <small>
+                            Vor- und Nachname, ggf. abweichender Familienname
+                        </small>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+        <p *ngIf="this.activityExpenses.value == 'false'" class="card-text">
+            <strong>Nein</strong>, es werden keine Aufwendungen für die persönliche Tätigkeit
+            (als Arzt, Zahnarzt, Heilpraktiker, Physiotherapeut usw.) eines nahen
+            Angehörigen (Ehegatte/in, Lebenspartner/in, Eltern, Kinder der behandelnden
+            Person) geltend gemacht.
+        </p>
+
+        <div *ngIf="this.illnessExpenses.value == 'true'">
+
+            <p class="card-text">
+                <strong>Ja</strong>, es werden Aufwendungen für Krankheiten, für die
+                Versicherungsleistungen ausgeschlossen oder eingestellt worden sind,
+                für folgende Personen geltend gemacht:
+            </p>
+
+            <div *ngFor="let group of this.illnessPersonList.controls; let i = index" class="row">
+                <div class="col-md-6">
+
+                    <div class="form-group">
+                        <input autocomplete="off"
+                               class="form-control"
+                               disabled
+                               type="text"
+                               value="{{ group.get('person').value }}">
+                        <small>
+                            Vor- und Nachname, ggf. abweichender Familienname
+                        </small>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+        <p *ngIf="this.illnessExpenses.value == 'false'" class="card-text">
+            <strong>Nein</strong>, es werden keine Aufwendungen für Krankheiten, für die
+            Versicherungsleistungen ausgeschlossen oder eingestellt worden sind,
+            geltend gemacht.
+        </p>
+
+        <div *ngIf="this.insuranceBenefits.value == 'true'">
+
+            <p class="card-text">
+                <strong>Ja</strong>, es werden Leistungen einer Auslandskranken- bzw.
+                Rücktransportversicherung für folgende Personen in Anspruch genommen:
+            </p>
+
+            <div *ngFor="let group of this.insurancePersonList.controls; let i = index" class="row">
+                <div class="col-md-6">
+
+                    <div class="form-group">
+                        <input autocomplete="off"
+                               class="form-control"
+                               disabled
+                               type="text"
+                               value="{{ group.get('person').value }}">
+                        <small>
+                            Vor- und Nachname, ggf. abweichender Familienname
+                        </small>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+        <p *ngIf="this.insuranceBenefits.value == 'false'" class="card-text">
+            <strong>Nein</strong>, es werden keine Leistungen einer Auslandskranken-
+            bzw. Rücktransportversicherung in Anspruch genommen.
+        </p>
+
+    </div>
+
+</div>

@@ -1,0 +1,19 @@
+.file-info {
+    display: flex;
+    justify-content: space-between;
+    white-space: normal;
+}
+.file-info-file-name {
+    flex-basis: 65%;
+    flex-shrink: 0;
+    padding-right: 5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    word-break: break-all;
+}
+.file-info-type {
+    flex-basis: 35%;
+    white-space: initial;
+    word-break: break-all;
+}

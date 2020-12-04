@@ -1,0 +1,104 @@
+<div [formGroup]="parentGroup">
+
+    <div class="info-data row">
+
+        <div class="form-group col-lg-1 col-sm-2">
+            <label class="no-clickable"
+                   for="{{ this.parentName + this.cardIndex.toString() }}NumberInput">
+                Belegnr.
+            </label>
+
+            <input autocomplete="off"
+                   class="form-control form-control-small text-center"
+                   disabled
+                   formControlName="index"
+                   id="{{ this.parentName + this.cardIndex.toString() }}NumberInput"
+                   type="text">
+        </div>
+
+        <div class="form-group col-lg-3 col-sm-4">
+            <label [class.disabled]="parentGroup.get('invoiceDate').disabled"
+                   for="{{ this.parentName + this.cardIndex.toString() }}InvoiceDateInput"> Datum der Rechnung*
+            </label>
+
+            <tlrz-display-date [delimiter]="'.'"
+                               formControlName="invoiceDate"
+                               labelledBy="{{ this.parentName + this.cardIndex.toString() }}InvoiceDateInput">
+            </tlrz-display-date>
+
+            <small *ngIf="this.invoiceDate.touched &&
+                          this.invoiceDate.dirty &&
+                          this.invoiceDate.invalid"
+                   class="invalid-input-small">
+                {{ this.errMsgService.getErrMsg(this.invoiceDate) }}
+            </small>
+        </div>
+
+        <div class="form-group col-lg-2 col-sm-6">
+            <label [class.disabled]="parentGroup.get('serviceType').disabled"
+                   for="{{ this.parentName + this.cardIndex.toString() }}ServiceTypeInput"> Art der Leistung*
+            </label>
+
+            <select [ngClass]="{'is-invalid': this.serviceType.touched &&
+                                          this.serviceType.dirty &&
+                                          this.serviceType.invalid }"
+                    class="form-control"
+                    formControlName="serviceType"
+                    id="{{ this.parentName + this.cardIndex.toString() }}ServiceTypeInput">
+                <!-- TODO: move magic number to enum -->
+                <option value="1"> ärztl. Behandlung</option>
+                <option value="2"> zahnärztl. Behandlung</option>
+                <option value="3"> Fahrtkosten</option>
+                <option value="4"> Heilmittel</option>
+                <option value="5"> Hilfsmittel</option>
+                <option value="6"> Krankenhaus</option>
+                <option value="7"> Rezept</option>
+                <option value="8"> Sonstige</option>
+            </select>
+
+            <small *ngIf="this.serviceType.touched &&
+                          this.serviceType.dirty &&
+                          this.serviceType.invalid"
+                   class="invalid-input-small">
+                {{ this.errMsgService.getErrMsg(this.serviceType) }}
+            </small>
+        </div>
+
+        <div class="form-group col-lg-3 col-sm-6">
+            <label [class.disabled]="parentGroup.get('invoiceAmount').disabled"
+                   for="{{ this.parentName + this.cardIndex.toString() }}InvoiceAmountInput"> Rechnungsbetrag*
+            </label>
+
+            <tlrz-display-currency [delimiter]="','"
+                                   formControlName="invoiceAmount"
+                                   labelledBy="{{ this.parentName + this.cardIndex.toString() }}InvoiceAmountInput">
+            </tlrz-display-currency>
+
+            <small *ngIf="this.invoiceAmount.touched &&
+                          this.invoiceAmount.dirty &&
+                          this.invoiceAmount.invalid"
+                   class="invalid-input-small">
+                {{ this.errMsgService.getErrMsg(this.invoiceAmount) }}
+            </small>
+        </div>
+
+        <div class="form-group col-lg-3 col-sm-6">
+            <label [class.disabled]="parentGroup.get('reimbursement').disabled"
+                   for="{{ this.parentName + this.cardIndex.toString() }}ReimbursementInput">
+                Falls kein Prozenttarif, Kostenerstattung von anderer Seite
+            </label>
+
+            <tlrz-display-currency [delimiter]="','"
+                                   formControlName="reimbursement"
+                                   labelledBy="{{ this.parentName + this.cardIndex.toString() }}ReimbursementInput">
+            </tlrz-display-currency>
+
+            <small *ngIf="this.reimbursement.touched &&
+                          this.reimbursement.dirty &&
+                          this.reimbursement.invalid"
+                   class="invalid-input-small">
+                {{ this.errMsgService.getErrMsg(this.reimbursement) }}
+            </small>
+        </div>
+    </div>
+</div>

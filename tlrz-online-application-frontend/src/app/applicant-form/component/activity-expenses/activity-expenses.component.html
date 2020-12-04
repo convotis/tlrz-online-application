@@ -1,0 +1,118 @@
+<form [formGroup]="servicesUsageGroup">
+
+    <div class="card">
+
+        <div class="card-body">
+
+            <p>
+                Werden Aufwendungen für die persönliche Tätigkeit (als Arzt, Zahnarzt,
+                Heilpraktiker, Physiotherapeut usw.) eines nahen Angehörigen (Ehegatte/in,
+                Lebenspartner/in, Eltern, Kinder der behandelten Person) geltend gemacht?*
+            </p>
+
+            <div class="d-flex justify-content-between previous-next">
+                <div [ngClass]="{'is-invalid-radio': this.activityExpenses.touched &&
+                                                     this.activityExpenses.dirty &&
+                                                     this.activityExpenses.invalid }">
+
+                    <div class="form-check">
+                        <input (click)="this.setListControlsValidators()"
+                               class="form-check-input"
+                               formControlName="activityExpenses"
+                               id="activityExpensesRadio1"
+                               name="activityExpenses"
+                               type="radio"
+                               value="true">
+                        <label class="form-check-label" for="activityExpensesRadio1">
+                            Ja, Name der behandelnden Person(en):
+                        </label>
+
+                        <div [hidden]="this.activityExpenses.value != 'true'"
+                             class="form form-group">
+
+                            <div *ngFor="let group of this.activityPersonList.controls; let personIndex = index;"
+                                 formArrayName="activityPersonList">
+
+                                <div formGroupName="{{personIndex}}">
+
+                                    <label for="activityPersonItem{{personIndex}}">
+                                        <small> Vor- und Nachname(n) </small>
+                                    </label>
+
+                                    <!-- TODO: move to separate component -->
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <button (click)="addToList(personIndex + 1)"
+                                                    class="delete-file-button"
+                                                    type="button"
+                                                    title="Eintrag hinzufügen"
+                                            >
+                                                <img class="close-icon" src="/o/tlrz-frontend-app/images/plus.svg" alt=""/>
+                                            </button>
+                                        </div>
+
+                                        <input class="form-control"
+                                               formControlName="person"
+                                               id="activityPersonItem{{personIndex}}"
+                                               type="text">
+
+                                        <div class="input-group-append">
+                                            <button (click)="removeFromList(personIndex)"
+                                                    class="delete-file-button"
+                                                    type="button"
+                                                    title="Eintrag entfernen"
+                                                    [class.hide-button]="this.activityPersonList.length <= 1"
+                                            >
+                                                <img class="close-icon"
+                                                     src="/o/tlrz-frontend-app/images/papierkorb.svg" alt=""/>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <small *ngIf="group.get('person').touched &&
+                                                  group.get('person').dirty &&
+                                                  group.get('person').invalid"
+                                           class="invalid-input-small">
+                                        {{ this.errMsgService.getErrMsg(group.get('person')) }}
+                                    </small>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-check">
+                        <input (click)="this.removeListControlsValidators()"
+                               class="form-check-input"
+                               formControlName="activityExpenses"
+                               id="activityExpensesRadio0"
+                               name="activityExpenses"
+                               type="radio"
+                               value="false">
+                        <label class="form-check-label" for="activityExpensesRadio0"> Nein </label>
+                    </div>
+                </div>
+
+                <div [hidden]="this.activityExpenses.value != 'true'">
+                    <div [isOpen]="true"
+                         containerClass="bs-tooltip-container-relative"
+                         placement="bottom"
+                         style="transform: translate3d(0, 0, 0);"
+                         tooltip="Belege bitte vor dem Scannen kennzeichnen und
+                                  Nachweis über entstandene Sachkosten beifügen"
+                         triggers="">
+                    </div>
+                </div>
+            </div>
+
+            <small *ngIf="this.activityExpenses.touched &&
+                              this.activityExpenses.dirty &&
+                              this.activityExpenses.invalid"
+                   class="invalid-input-small">
+                {{ errMsgService.getErrMsgByKey('chooseRadio') }}
+            </small>
+        </div>
+
+    </div>
+
+</form>

@@ -1,0 +1,63 @@
+<form (submit)="submit()" [formGroup]="expensesForPartnerGroup" class="custom-form">
+
+    <div *ngFor="let control of this.expensesForPartnerArray.controls; let cardIndex = index;"
+         formArrayName="expensesForPartnerArray">
+
+        <div class="card" formGroupName="{{cardIndex}}">
+
+            <div *ngIf="cardIndex != 0" class="custom-close-button">
+                <button (click)="removeCardFromMainArray(cardIndex)"
+                        class="close"
+                        type="button"
+                        title="Schließen"
+                >
+                    <img class="close-icon" src="/o/tlrz-frontend-app/images/close-24px.svg" alt="" />
+                </button>
+            </div>
+
+            <div class="card-body">
+
+                <div class="class-body">
+
+                    <tlrz-service-data-inputs [cardIndex]="cardIndex"
+                                              [parentGroup]="control"
+                                              [parentName]="'expensesForPartner'">
+                    </tlrz-service-data-inputs>
+
+                    <tlrz-file-type-list [parentGroup]="control"
+                                         [group1]="expensesForChildrenGroup"
+                                         [group2]="applicantExpensesGroup"
+                                         [uniqueId]="'forPartner' + cardIndex">
+                    </tlrz-file-type-list>
+
+                </div>
+
+            </div>
+
+            <small *ngIf="this.showSubmitError[cardIndex] ? this.showSubmitError[cardIndex] : false"
+                   class="invalid-input-small is-invalid-section-label">
+                {{ this.errMsgService.getErrMsg(this.control) }}
+            </small>
+
+        </div>
+
+        <div>
+            <button (click)="this.addCardToMainArray(cardIndex)"
+                    class="btn btn-primary add-card-btn"
+                    type="button">
+                Weiteren Beleg hinzufügen
+            </button>
+        </div>
+
+    </div>
+
+    <small *ngIf="!(this.expensesForPartnerGroup.valid)"
+           class="invalid-input-small is-invalid-section-label is-bottom-label">
+        {{ this.errMsgService.getErrMsg(this.expensesForPartnerGroup) }}
+    </small>
+
+    <div>
+        <tlrz-previos-next-btn (previous)="return()"></tlrz-previos-next-btn>
+    </div>
+
+</form>

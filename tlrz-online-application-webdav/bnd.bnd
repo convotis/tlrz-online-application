@@ -1,0 +1,11 @@
+Bundle-Name: WebDAV Accessor
+Bundle-SymbolicName: de.xdot.onlineapplication.webdav
+Bundle-Version: 1.0.0
+Export-Package: \
+    de.xdot.onlineapplication.webdav.service
+Import-Package: *;
+-includeresource: \
+    META-INF/lib/sardine.jar=sardine-[0-9]*.jar;lib:=true,\
+    META-INF/lib/httpcore.jar=httpcore-[0-9]*.jar;lib:=true,\
+    META-INF/lib/httpclient.jar=httpclient-[0-9]*.jar;lib:=true,\
+
