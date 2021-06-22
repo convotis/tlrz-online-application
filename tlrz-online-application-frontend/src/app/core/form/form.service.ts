@@ -10,6 +10,16 @@ interface Files {
     size: number;
 }
 
+interface FormDataEntrySize {
+    name: string;
+    low, high: number;
+}
+
+interface FormDataEntryHolder {
+    key: string;
+    value: FormDataEntryValue
+}
+
 /* TODO: move Wizard from core to 'ui' or related feature module */
 @Injectable({
   providedIn: 'root'
@@ -36,9 +46,9 @@ export class FormService {
 
                     case HttpEventType.UploadProgress:
                         const progress = Math.round(100 * event.loaded / event.total);
-                        return {type: 'progress', message: progress};
+                        return {type: 'progress', message: progress, bytesLoaded: event.loaded};
                     case HttpEventType.Response:
-                        return {type: 'body', message: event.body, contentDisposition: event.headers.get('content-disposition'), xCreated: event.headers.get('x-created'), status: event.headers.get('x-status')};
+                        return {type: 'body', message: event.body, contentDisposition: event.headers.get('content-disposition'), xCreated: event.headers.get('x-created'), processId: event.headers.get('x-processId'), status: event.headers.get('x-status')};
                     default:
                         return {type: 'unhandled', message: `Unhandled event: ${event.type}`};
                 }
@@ -46,12 +56,56 @@ export class FormService {
         )
     }
 
-    public objectToFormData(formValue: any, formData: FormData, files: Files, namespace?: string, index?: number) {
+    public objectToFormData(formValue: any, formData: FormData, files: Files, formSizes: Array<FormDataEntrySize>) {
+        const BOUNDARY_SIZE = 60;
+        const CONTENT_DISPOSITION_SIZE = 39;
+
+        let filesFormDataHolder: Array<FormDataEntryHolder> = [];
+
+        let formSize = 0;
+        let lastLow = 0;
+
+        this.objectToFormDataInternal(formValue, formData, files, filesFormDataHolder, (value: FormDataEntryValue, key: string) => {
+            let size = BOUNDARY_SIZE + CONTENT_DISPOSITION_SIZE;
+            size += 6 //CR LF * 3
+            size += key.length;
+
+            if (typeof value === "string") {
+                formSize += (size + value.length);
+            }
+        });
+
+        for (let formDataEntryHolder of filesFormDataHolder) {
+            let value = formDataEntryHolder.value as File;
+
+            formData.append(formDataEntryHolder.key, value);
+
+            let size = BOUNDARY_SIZE + CONTENT_DISPOSITION_SIZE;
+            size += 6 //CR LF * 3
+            size += formDataEntryHolder.key.length;
+
+            if (lastLow === 0) {
+                lastLow = formSize + 1;
+            }
+
+            let fileSize = size + value.size;
+
+            let fileDataSize : FormDataEntrySize = { name: value.name, low: lastLow, high: lastLow + fileSize};
+
+            lastLow += (fileSize + 1)
+
+            formSizes.push(fileDataSize);
+        }
+
+        let formDataSize : FormDataEntrySize = { name: 'Form', low: 0, high: formSize};
+        formSizes.push(formDataSize);
+    }
+
+    public objectToFormDataInternal(formValue: any, formData: FormData, files: Files, filesFormDataHolder: Array<FormDataEntryHolder>, callback: (value: FormDataEntryValue, key: string) => void, namespace?: string, index?: number) {
 
         let formKey;
 
         for(const property in formValue) {
-
             if(formValue.hasOwnProperty(property)) {
 
                 if (namespace) {
@@ -62,22 +116,27 @@ export class FormService {
 
                 switch (true) {
                     case typeof formValue[property] === 'object' && !(formValue[property] instanceof File) && !(formValue[property] instanceof Array):
-                        this.objectToFormData(formValue[property], formData, files, formKey);
+                        this.objectToFormDataInternal(formValue[property], formData, files, filesFormDataHolder, callback, formKey);
                         break;
                     case typeof formValue[property] === 'object' && !(formValue[property] instanceof File) && (formValue[property] instanceof Array):
 
                         let arrayIndex = 1;
 
                         for (const arrayValue of formValue[property]) {
-                            this.objectToFormData(arrayValue, formData, files, formKey, arrayIndex);
+                            this.objectToFormDataInternal(arrayValue, formData, files, filesFormDataHolder, callback, formKey, arrayIndex);
                             arrayIndex++
                         }
                         break;
                     default:
                         if (formValue[property] instanceof File) {
                             files.size += formValue[property].size;
+
+                            filesFormDataHolder.push({key: formKey, value: formValue[property]});
+                        } else {
+                            formData.append(formKey, formValue[property]);
+
+                            callback.apply(null, [formValue[property], formKey]);
                         }
-                        formData.append(formKey, formValue[property]);
                 }
             }
         }

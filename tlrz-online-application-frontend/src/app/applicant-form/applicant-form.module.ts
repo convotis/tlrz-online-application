@@ -38,6 +38,10 @@ import {FileUploadModule} from "../ui/form/file-upload/file-upload.module";
 import {ExpandedRadioBtnModule} from '../ui/form/expanded-radio-btn/expanded-radio-btn.module';
 import {CardService} from "./shared/card.service";
 
+import {ProcessIdModule} from "../ui/form/process-id/process-id.module";
+import {FileListComponent} from "./component/file-list/file-list.component";
+import {SessionTimerModule} from "../ui/form/session-timer/session-timer.module";
+
 @NgModule({
     entryComponents: [
         FileInfoListCellComponent,
@@ -51,6 +55,7 @@ import {CardService} from "./shared/card.service";
         SummaryServicesUsage,
         ApplicantDetailsComponent,
         FileTypeListComponent,
+        FileListComponent,
         FundsDetailsComponent,
         IllnessExpensesComponent,
         ServiceDataInputsComponent,
@@ -81,7 +86,9 @@ import {CardService} from "./shared/card.service";
         NgxDatatableModule,
         FormsModule,
         AgGridModule.withComponents([]),
-        ExpandedRadioBtnModule
+        ExpandedRadioBtnModule,
+        ProcessIdModule,
+        SessionTimerModule
     ],
     providers: [
         AlertConfig,

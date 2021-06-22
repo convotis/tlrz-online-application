@@ -30,6 +30,21 @@
                    value="${privacyInformationLink}">
         </aui:input>
 
+        <aui:input name="sessionTimeoutTitle" label="session-timeout-title" type="text"
+                   value="${sessionTimeoutTitle}">
+        </aui:input>
+
+        <aui:input name="sessionTimeoutText" label="session-timeout-text" type="text"
+                   value="${sessionTimeoutText}">
+        </aui:input>
+
+        <aui:input name="sessionTimeoutButton" label="session-timeout-button" type="text"
+                   value="${sessionTimeoutButton}">
+        </aui:input>
+
+        <aui:input name="sessionTimeoutLink" label="session-timeout-link" type="text"
+                   value="${sessionTimeoutLink}">
+        </aui:input>
     </aui:fieldset>
     <aui:button-row>
         <aui:button type="submit" />

@@ -2,6 +2,7 @@ import {Component, Input} from '@angular/core';
 import {FormArray, FormControl, FormGroup, Validators} from "@angular/forms";
 
 import {ErrMsgService} from "../../../core/err-msg/err-msg.service";
+import {SessionTimerService} from "../../../core/session-timer/session-timer.service";
 
 @Component({
   selector: 'tlrz-illness-expenses',
@@ -14,6 +15,7 @@ export class IllnessExpensesComponent {
 
     constructor(
         private errMsgService: ErrMsgService,
+        private sessionTimerService: SessionTimerService
     ) { }
 
     public get illnessExpenses(): FormControl {
@@ -48,7 +50,10 @@ export class IllnessExpensesComponent {
     }
 
     private addToList(controlIndex: number) {
-        Liferay.Session.extend();
+        if (Liferay && Liferay.Session) {
+            Liferay.Session.extend();
+        }
+        this.sessionTimerService.resetTimer();
 
         if (this.illnessPersonList.length < 10) {
             this.illnessPersonList.insert(controlIndex,

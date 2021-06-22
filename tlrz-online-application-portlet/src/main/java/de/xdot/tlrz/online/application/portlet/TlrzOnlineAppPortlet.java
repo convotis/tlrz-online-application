@@ -33,6 +33,11 @@ import java.util.TimeZone;
     service = Portlet.class)
 public class TlrzOnlineAppPortlet extends MVCPortlet {
 
+    private static final String DEFAULT_SESSION_TIMEOUT_TITLE = "Hinweis";
+    private static final String DEFAULT_SESSION_TIMEOUT_TEXT = "Ihre Session ist aufgelaufen. Sie müssen Ihren Antrag erneut starten. Alle Daten müssen erneut eingegeben werden.";
+    private static final String DEFAULT_SESSION_TIMEOUT_BUTTON = "Hier gelangen Sie zum neuen Antrag";
+    private static final String DEFAULT_SESSION_TIMEOUT_LINK = "https://verwaltung.thueringen.de/ekabhi";
+
     @Override
     public void doEdit(RenderRequest renderRequest, RenderResponse renderResponse) throws IOException, PortletException {
 
@@ -101,6 +106,14 @@ public class TlrzOnlineAppPortlet extends MVCPortlet {
         request.setAttribute("informationAboutGrantLink", portletPreferences.getValue("informationAboutGrantLink", StringPool.BLANK));
 
         request.setAttribute("privacyInformationLink", portletPreferences.getValue("privacyInformationLink", StringPool.BLANK));
+
+        request.setAttribute("sessionTimeoutTitle", portletPreferences.getValue("sessionTimeoutTitle", DEFAULT_SESSION_TIMEOUT_TITLE));
+
+        request.setAttribute("sessionTimeoutText", portletPreferences.getValue("sessionTimeoutText", DEFAULT_SESSION_TIMEOUT_TEXT));
+
+        request.setAttribute("sessionTimeoutButton", portletPreferences.getValue("sessionTimeoutButton", DEFAULT_SESSION_TIMEOUT_BUTTON));
+
+        request.setAttribute("sessionTimeoutLink", portletPreferences.getValue("sessionTimeoutLink", DEFAULT_SESSION_TIMEOUT_LINK));
     }
 
 }

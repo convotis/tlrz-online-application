@@ -9,5 +9,10 @@ export const applicationContext: ApplicationContext = {
     toTheOnlineApplicationLink: '',
     informationAboutGrantLink: '',
     privacyInformationLink: '',
-    offset: ''
+    offset: '',
+    sessionLength: 90000,
+    sessionTimeoutTitle: 'Hinweis',
+    sessionTimeoutText: 'Ihre Session ist aufgelaufen. Sie müssen Ihren Antrag erneut starten. Alle Daten müssen erneut eingegeben werden.',
+    sessionTimeoutButton: 'Hier gelangen Sie zum neuen Antrag',
+    sessionTimeoutLink: 'http://localhost:3000'
 };

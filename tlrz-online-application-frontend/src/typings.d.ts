@@ -23,6 +23,11 @@ declare interface ApplicationContext {
     informationAboutGrantLink: string;
     privacyInformationLink: string;
     offset: string;
+    sessionLength: number,
+    sessionTimeoutTitle: string,
+    sessionTimeoutText: string,
+    sessionTimeoutButton: string,
+    sessionTimeoutLink: string
 }
 
 declare const System: System;

@@ -78,6 +78,10 @@ export class ApplicantFormComponent extends AutoUnsubscribe implements OnInit {
         return <FormArray>this.expensesForChildrenGroup.get('expensesForChildrenArray');
     }
 
+    public get partnerIncomeConfirmation(): FormGroup {
+        return <FormGroup>this.applicantAndFundsGroup.get('partnerIncomeConfirmation');
+    }
+
     public get activePageIndex(): number {
 
         let activePageIndex = localStorage.getItem('activePageIndex');
@@ -128,6 +132,15 @@ export class ApplicantFormComponent extends AutoUnsubscribe implements OnInit {
         })
     }
 
+    private get optionalFilesGroup() {
+        return new FormGroup({
+            file: new FormControl(null, [
+                CustomValidator.requiredFileExtension(".pdf, .jpg, .jpeg, .gif, .bmp, .png"),
+                CustomValidator.maxSize(10485760)]
+            )
+        })
+    }
+
     constructor(
         private formBuilder: FormBuilder,
         private cardService: CardService,
@@ -142,7 +155,6 @@ export class ApplicantFormComponent extends AutoUnsubscribe implements OnInit {
 
             // Applicant and Funds page
             applicantAndFunds: new FormGroup({
-
                 // Applicant Details
 
                 lastName: new FormControl({value: this.currentApplicant.lastName, disabled: true}),
@@ -173,7 +185,11 @@ export class ApplicantFormComponent extends AutoUnsubscribe implements OnInit {
                 }),
                 partnerIncomeConfirmation: new FormGroup({
                     confirmation: new FormControl(null),
-                    taxAssessmentFile: new FormControl(null)
+                    files: new FormArray([
+                        new FormGroup({
+                            file: new FormControl(null)
+                        })
+                    ])
                 })
             }, [CustomValidator.atLeastOneMustBeTrue(this), CustomValidator.testValidator()]),
 
@@ -314,6 +330,7 @@ export class ApplicantFormComponent extends AutoUnsubscribe implements OnInit {
                 this.makeFitToStoredArray(this.applicantExpensesArray, applicantForm.applicantExpenses.applicantExpensesArray);
                 this.makeFitToStoredArray(this.expensesForPartnerArray, applicantForm.expensesForPartner.expensesForPartnerArray);
                 this.makeFitToStoredArray(this.expensesForChildrenArray, applicantForm.expensesForChildren.expensesForChildrenArray);
+                this.makeFilesFitToStoredArray(this.partnerIncomeConfirmation, applicantForm.applicantAndFunds.partnerIncomeConfirmation);
 
                 this.applicantReactiveForm.patchValue(applicantForm);
             }
@@ -338,6 +355,12 @@ export class ApplicantFormComponent extends AutoUnsubscribe implements OnInit {
 
                 (<FormArray>formArray.get(i.toString()).get('files')).push(this.optionalPageFilesGroup);
             }
+        }
+    }
+
+    private makeFilesFitToStoredArray(formGroup: FormGroup, storedData: any) {
+        while (storedData.files.length > (<FormArray>formGroup.get('files')).length) {
+            (<FormArray>formGroup.get('files')).push(this.optionalFilesGroup);
         }
     }
 }

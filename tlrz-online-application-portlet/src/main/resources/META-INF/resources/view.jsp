@@ -24,7 +24,13 @@
         '${privacyInformationLink}',
         '<liferay-portlet:resourceURL id="<%=OnlineAppPortletKeys.SUBMIT_FORM%>"/>',
         '${currentUser}',
-        '${offset}');
+        '${offset}',
+        <%= PropsValues.SESSION_TIMEOUT * 60 * 1000 %>,
+        '${sessionTimeoutTitle}',
+        '${sessionTimeoutText}',
+        '${sessionTimeoutButton}',
+        '${sessionTimeoutLink}'
+        );
     </aui:script>
 
 
@@ -41,5 +47,5 @@
 </c:if>
 
 <!--placeholder-start-->
-<script src="/o/tlrz-frontend-app/main.5999db72e403c12529f4.js"></script>
+<script src="/o/tlrz-frontend-app/main.e40f574555bf11cdfd9e.js"></script>
 <!--placeholder-end-->

@@ -28,6 +28,14 @@ public class TlrzOnlineConfigurationAction extends BaseMVCActionCommand {
             preferences.setValue("informationAboutGrantLink", ParamUtil.getString(actionRequest, "informationAboutGrantLink"));
 
             preferences.setValue("privacyInformationLink", ParamUtil.getString(actionRequest, "privacyInformationLink"));
+
+            preferences.setValue("sessionTimeoutTitle", ParamUtil.getString(actionRequest, "sessionTimeoutTitle"));
+
+            preferences.setValue("sessionTimeoutText", ParamUtil.getString(actionRequest, "sessionTimeoutText"));
+
+            preferences.setValue("sessionTimeoutButton", ParamUtil.getString(actionRequest, "sessionTimeoutButton"));
+
+            preferences.setValue("sessionTimeoutLink", ParamUtil.getString(actionRequest, "sessionTimeoutLink"));
         } catch (ReadOnlyException e) {
             saveResult = "fail";
         }

@@ -62,7 +62,8 @@
 
 
     modal-container.modal.fade.show {
-        .return-modal.modal-dialog {
+        .return-modal.modal-dialog,
+        .session-timeout-modal.modal-dialog {
             position: relative;
             top: 50%;
             transform: translateY(-50%);
@@ -74,23 +75,6 @@
 
                 .modal-header, .modal-body, .modal-footer {
                     border: none;
-                }
-
-                .modal-header {
-                    height: 40px;
-                    padding: 0;
-                    justify-content: flex-end;
-
-                    .close.pull-right {
-                        padding-right: 3rem;
-                        padding-top: 24px;
-                        opacity: 1;
-
-                        img {
-                            background-color: #A66201;
-                        }
-
-                    }
                 }
 
                 .modal-body {
@@ -105,10 +89,47 @@
                         opacity: 1;
                         border: none;
                         background-color: #A66201;
+
+                        &:hover,
+                        &:active,
+                        &:focus {
+                            color: #FEE4C9;
+                        }
                     }
                 }
             }
         }
+
+        .return-modal.modal-dialog {
+            .modal-header {
+                height: 40px;
+                padding: 0;
+                justify-content: flex-end;
+
+                .close.pull-right {
+                    padding-right: 3rem;
+                    padding-top: 24px;
+                    opacity: 1;
+
+                    img {
+                        background-color: #A66201;
+                    }
+                }
+            }
+        }
+
+        .session-timeout-modal.modal-dialog {
+            .modal-header {
+                height: 40px;
+                padding: 1rem 0 0;
+                justify-content: center;
+
+                h2 {
+                    color: #7f523d;
+                }
+            }
+        }
+
     }
 
     .is-invalid-radio {

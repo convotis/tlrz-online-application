@@ -11,6 +11,7 @@ import com.liferay.portal.kernel.util.Validator;
 import de.xdot.pdf.creation.model.OnlineApplicationFormModel;
 import de.xdot.pdf.creation.model.sub.ExpensesModel;
 import de.xdot.pdf.creation.service.impl.PDFGeneratorImpl;
+import de.xdot.pdf.creation.status.ProcessIdHolder;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
@@ -100,14 +101,14 @@ public class TextWriter {
             e.printStackTrace();
         }
         doc.addPage(page);
-        InputStream fontStream = PDFGeneratorImpl.class.getResourceAsStream("/ArialMT.ttf");
+        InputStream fontStream = PDFGeneratorImpl.class.getResourceAsStream("/FreeSans.ttf");
         InputStream fontBoldStream = PDFGeneratorImpl.class.getResourceAsStream("/arial_bold.ttf");
         this.contentStream = new PDPageContentStream(doc, page);
         PDFont font = PDType0Font.load(doc, fontStream);
         PDFont boldFont = PDType0Font.load(doc, fontBoldStream);
 
         writeBoldText(font, boldFont, HEADER_FONT_SIZE, MARGIN, contentStream, "Online-Kurzantrag auf Beihilfe");
-        writeAdaptingText(font, TEXT_FONT_SIZE, MARGIN, contentStream, "Der Online-Kurzantrag auf Beihilfe wurde am " + onlineApplicationFormModel.getPdfCreationTime()+ " Uhr (Ortszeit Erfurt) angenommen.");
+        writeAdaptingText(font, TEXT_FONT_SIZE, MARGIN, contentStream, "Der Online-Kurzantrag auf Beihilfe wurde am " + onlineApplicationFormModel.getPdfCreationTime()+ " Uhr (Ortszeit Erfurt) mit der Vorgangs-ID " + ProcessIdHolder.processId.get() + " angenommen.");
 
         writeNewLine(contentStream);
 

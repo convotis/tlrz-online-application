@@ -2,7 +2,16 @@
     <div>
         <div class="applicant-form">
 
-            <h1> Online-Kurzantrag auf Beihilfe </h1>
+            <div class="d-flex justify-content-between">
+                <div>
+                    <h1> Online-Kurzantrag auf Beihilfe </h1>
+                </div>
+                <div>
+                    <tlrz-process-id></tlrz-process-id>
+
+                    <tlrz-session-timer></tlrz-session-timer>
+                </div>
+            </div>
 
             <aw-wizard [awNavigationMode] navigateBackward="allow" navigateForward="allow"
                        [disableNavigationBar]="true"

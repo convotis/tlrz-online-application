@@ -73,4 +73,10 @@ public interface TlrzOnlineApplicationConfiguration {
         required = false
     )
     public String webDAVUsername();
+
+    @Meta.AD(
+        name = PDFMergingConstants.WEB_DAV_PREEMTIVE_AUTHENTICATION,
+        required = false
+    )
+    public boolean webDAVPreemtiveAuthentication();
 }

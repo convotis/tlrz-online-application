@@ -4,7 +4,8 @@ Bundle-Version: 1.0.0
 Export-Package: \
     de.xdot.pdf.creation.model,\
     de.xdot.pdf.creation.model.sub,\
-    de.xdot.pdf.creation.service
+    de.xdot.pdf.creation.service,\
+    de.xdot.pdf.creation.status
 Import-Package: *;resolution:=optional
 -includeresource: \
     META-INF/lib/pdfbox.jar=pdfbox-[0-9]*.jar;lib:=true,\

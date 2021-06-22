@@ -1,10 +1,10 @@
 package de.xdot.pdf.creation.model.sub;
 
-import java.io.File;
+import java.util.List;
 
 public class PartnerIncomeConfirmationModel {
     private Integer confirmation;
-    private File taxAssessmentFile;
+    private List<TaxFileModel> taxAssessmentFiles;
     private String taxAssessmentFileName;
     private Boolean preCalendarYear;
     private Boolean calendarYear;
@@ -18,20 +18,12 @@ public class PartnerIncomeConfirmationModel {
         this.confirmation = confirmation;
     }
 
-    public File getTaxAssessmentFile() {
-        return taxAssessmentFile;
+    public List<TaxFileModel> getTaxAssessmentFiles() {
+        return taxAssessmentFiles;
     }
 
-    public void setTaxAssessmentFile(File taxAssessmentFile) {
-        this.taxAssessmentFile = taxAssessmentFile;
-    }
-
-    public String getTaxAssessmentFileName() {
-        return taxAssessmentFileName;
-    }
-
-    public void setTaxAssessmentFileName(String taxAssessmentFileName) {
-        this.taxAssessmentFileName = taxAssessmentFileName;
+    public void setTaxAssessmentFiles(List<TaxFileModel> taxAssessmentFile) {
+        this.taxAssessmentFiles = taxAssessmentFile;
     }
 
     public Boolean getPreCalendarYear() {
@@ -54,7 +46,7 @@ public class PartnerIncomeConfirmationModel {
     public String toString() {
         return "PartnerIncomeConfirmationModel{" +
             "confirmation=" + confirmation +
-            ", taxAssessmentFile=" + taxAssessmentFile +
+            ", taxAssessmentFile=" + taxAssessmentFiles +
             ", preCalendarYear=" + preCalendarYear +
             ", calendarYear=" + calendarYear +
             '}';

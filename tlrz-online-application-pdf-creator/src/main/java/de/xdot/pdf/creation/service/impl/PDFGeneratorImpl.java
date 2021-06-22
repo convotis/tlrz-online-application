@@ -4,20 +4,23 @@ import com.liferay.mail.kernel.model.MailMessage;
 import com.liferay.mail.kernel.service.MailService;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.security.RandomUtil;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.Validator;
 import de.xdot.configuration.TlrzOnlineApplicationConfiguration;
 import de.xdot.encryptor.service.PGEncryptor;
 import de.xdot.onlineapplication.webdav.service.WebDavService;
 import de.xdot.pdf.creation.ImageDrawer;
+import de.xdot.pdf.creation.PDFAConfigs;
 import de.xdot.pdf.creation.TextWriter;
 import de.xdot.pdf.creation.constants.PDFCreationConstants;
 import de.xdot.pdf.creation.model.OnlineApplicationFormModel;
 import de.xdot.pdf.creation.model.PDFGenerationResult;
 import de.xdot.pdf.creation.model.sub.ApplicantFileModel;
 import de.xdot.pdf.creation.model.sub.ExpensesModel;
+import de.xdot.pdf.creation.model.sub.TaxFileModel;
 import de.xdot.pdf.creation.service.PDFGenerator;
+import de.xdot.pdf.creation.status.ProcessIdHolder;
+import de.xdot.pdf.creation.status.ProcessStepHolder;
 import org.apache.pdfbox.io.MemoryUsageSetting;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
@@ -80,7 +83,7 @@ public class PDFGeneratorImpl implements PDFGenerator {
 
         for (AbstractMap.SimpleImmutableEntry<String, String> srcFile : srcFiles) {
             if (log.isDebugEnabled()) {
-                log.debug("Adding " + srcFile.getKey() + " to the ZIP file with filename " + srcFile.getValue());
+                log.debug("(Vorgangs-ID: " + ProcessIdHolder.processId.get() + ") " + "Adding " + srcFile.getKey() + " to the ZIP file with filename " + srcFile.getValue());
             }
             File fileToZip = new File(srcFile.getKey());
             FileInputStream fis = new FileInputStream(fileToZip);
@@ -111,7 +114,7 @@ public class PDFGeneratorImpl implements PDFGenerator {
         }
 
         if (log.isDebugEnabled()) {
-            log.debug("Writing final ZIP file");
+            log.debug("(Vorgangs-ID: " + ProcessIdHolder.processId.get() + ") " + "Writing final ZIP file");
         }
 
         zipOut.close();
@@ -121,8 +124,10 @@ public class PDFGeneratorImpl implements PDFGenerator {
         String typeOfPDFMerge = pdfConfiguration.typeOfPDFMerge();
 
         if (log.isDebugEnabled()) {
-            log.debug("Generating PDF/ZIP with the configuration option " + typeOfPDFMerge);
+            log.debug("(Vorgangs-ID: " + ProcessIdHolder.processId.get() + ") " + "Generating PDF/ZIP with the configuration option " + typeOfPDFMerge);
         }
+
+        ProcessStepHolder.processStep.set("Erzeugung der Quittungs-PDF-Datei");
 
         List<AbstractMap.SimpleImmutableEntry<String, String>> srcFiles = new ArrayList<>();
         List<String> filesTodelete = new ArrayList<>();
@@ -133,14 +138,14 @@ public class PDFGeneratorImpl implements PDFGenerator {
         fileName.append(".pdf");
         fileName.insert(0, onlineApplicationFormModel.getApplicantAndFundsModel().getFirstName() + onlineApplicationFormModel.getApplicantAndFundsModel().getLastName());
         zipFileName.append("_");
-        zipFileName.append(String.format("%06d", RandomUtil.nextInt(999999) + 1));
+        zipFileName.append(ProcessIdHolder.processId.get());
 
         zipFileName.append(".zip");
         File file = FileUtil.createTempFile("pdf");
         ImageDrawer drawImage = new ImageDrawer();
         TextWriter textWriter = new TextWriter();
 
-        File taxAssessmentFile = onlineApplicationFormModel.getApplicantAndFundsModel().getPartnerIncomeConfirmation().getTaxAssessmentFile();
+        List<TaxFileModel> taxAssessmentFiles = onlineApplicationFormModel.getApplicantAndFundsModel().getPartnerIncomeConfirmation().getTaxAssessmentFiles();
 
         Collection<PDDocument> mergedDocuments = new ArrayList<>();
 
@@ -182,22 +187,56 @@ public class PDFGeneratorImpl implements PDFGenerator {
 
             if (typeOfPDFMerge.equals(PDFCreationConstants.MERGED_PDF) || typeOfPDFMerge.equals(PDFCreationConstants.MERGED_PDF_WITH_FILES) || typeOfPDFMerge.equals(PDFCreationConstants.ZIP_FILE_FOR_EKABHI)) {
 
-                if (Validator.isNotNull(taxAssessmentFile)) {
-                    filesTodelete.add(taxAssessmentFile.getAbsolutePath());
+                if (Validator.isNotNull(taxAssessmentFiles)) {
+                    for (TaxFileModel taxAssessmentFile : taxAssessmentFiles) {
+                        filesTodelete.add(taxAssessmentFile.getFile().getAbsolutePath());
 
-                    if (taxAssessmentFile.getName().endsWith(".pdf")) {
-                        PDDocument pdf = mergePDF(taxAssessmentFile, doc, "Steuerbescheid");
+                        if (taxAssessmentFile.getFile().getName().endsWith(".pdf")) {
+                            PDDocument pdf = mergePDF(taxAssessmentFile.getFile(), doc, taxAssessmentFile.getFilename());
 
-                        mergedDocuments.add(pdf);
-                    } else {
-                        if (log.isDebugEnabled()) {
-                            log.debug("Drawing " + taxAssessmentFile.getPath() + " from the Steuerbescheid into the final PDF");
+                            mergedDocuments.add(pdf);
+                        } else {
+                            if (log.isDebugEnabled()) {
+                                log.debug("(Vorgangs-ID: " + ProcessIdHolder.processId.get() + ") " + "Drawing " + taxAssessmentFile.getFile().getPath() + " from the Steuerbescheid into the final PDF");
+                            }
+
+                            drawImage.drawImage(taxAssessmentFile.getFile().getPath(), doc);
                         }
-
-                        drawImage.drawImage(taxAssessmentFile.getPath(), doc);
                     }
 
                     if (typeOfPDFMerge.equals(PDFCreationConstants.ZIP_FILE_FOR_EKABHI)) {
+                        Collection<PDDocument> taxDocuments = new ArrayList<>();
+
+                        PDDocument taxPdf = new PDDocument();
+
+                        PDFAConfigs pdfaConfigs = new PDFAConfigs();
+                        try {
+                            pdfaConfigs.applyPDFAConfig(taxPdf);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+
+                        for (TaxFileModel taxAssessmentFile : taxAssessmentFiles) {
+                            if (taxAssessmentFile.getFile().getName().endsWith(".pdf")) {
+                                PDDocument pdf = mergePDF(taxAssessmentFile.getFile(), taxPdf, taxAssessmentFile.getFilename());
+
+                                taxDocuments.add(pdf);
+                            } else {
+                                drawImage.drawImage(taxAssessmentFile.getFile().getPath(), taxPdf);
+                            }
+                        }
+
+                        File tempFile = FileUtil.createTempFile("pdf");
+
+                        taxPdf.save(tempFile);
+
+                        filesTodelete.add(tempFile.getAbsolutePath());
+
+                        //workaround for https://issues.apache.org/jira/browse/PDFBOX-3280. Close imported PDF after writing the target PDF file.
+                        for (PDDocument pdf : taxDocuments) {
+                            pdf.close();
+                        }
+
                         String taxAssessmentFileName = onlineApplicationFormModel.getApplicantAndFundsModel().getLastName() +
                             "_" +
                             onlineApplicationFormModel.getApplicantAndFundsModel().getFirstName() +
@@ -207,11 +246,12 @@ public class PDFGeneratorImpl implements PDFGenerator {
                             onlineApplicationFormModel.getPdfCreationRowTime() +
                             "_" +
                             "StB" +
-                            "." +
-                            FileUtil.getExtension(taxAssessmentFile.getName());
-                        srcFiles.add(new AbstractMap.SimpleImmutableEntry<>(taxAssessmentFile.getPath(), basePath + "/" + taxAssessmentFileName));
+                            ".pdf";
+                        srcFiles.add(new AbstractMap.SimpleImmutableEntry<>(tempFile.getPath(), basePath + "/" + taxAssessmentFileName));
                     } else {
-                        srcFiles.add(new AbstractMap.SimpleImmutableEntry<>(taxAssessmentFile.getPath(), onlineApplicationFormModel.getApplicantAndFundsModel().getPartnerIncomeConfirmation().getTaxAssessmentFileName()));
+                        for (TaxFileModel taxAssessmentFile : taxAssessmentFiles) {
+                            srcFiles.add(new AbstractMap.SimpleImmutableEntry<>(taxAssessmentFile.getFile().getPath(), taxAssessmentFile.getFilename()));
+                        }
                     }
                 }
 
@@ -228,7 +268,7 @@ public class PDFGeneratorImpl implements PDFGenerator {
                                 mergedDocuments.add(pdf);
                             } else {
                                 if (log.isDebugEnabled()) {
-                                    log.debug("Drawing " + element.getFile().getPath() + " from the Application Expenses into the final PDF");
+                                    log.debug("(Vorgangs-ID: " + ProcessIdHolder.processId.get() + ") " + "Drawing " + element.getFile().getPath() + " from the Application Expenses into the final PDF");
                                 }
 
                                 drawImage.drawImage(element.getFile().getPath(), doc);
@@ -281,7 +321,7 @@ public class PDFGeneratorImpl implements PDFGenerator {
                                 mergedDocuments.add(pdf);
                             } else {
                                 if (log.isDebugEnabled()) {
-                                    log.debug("Drawing " + element.getFile().getPath() + " from the Expenses for Partner into the final PDF");
+                                    log.debug("(Vorgangs-ID: " + ProcessIdHolder.processId.get() + ") " + "Drawing " + element.getFile().getPath() + " from the Expenses for Partner into the final PDF");
                                 }
 
                                 drawImage.drawImage(element.getFile().getPath(), doc);
@@ -334,7 +374,7 @@ public class PDFGeneratorImpl implements PDFGenerator {
                                 mergedDocuments.add(pdf);
                             } else {
                                 if (log.isDebugEnabled()) {
-                                    log.debug("Drawing " + element.getFile().getPath() + " from the Expenses for Children into the final PDF");
+                                    log.debug("(Vorgangs-ID: " + ProcessIdHolder.processId.get() + ") " + "Drawing " + element.getFile().getPath() + " from the Expenses for Children into the final PDF");
                                 }
 
                                 drawImage.drawImage(element.getFile().getPath(), doc);
@@ -379,7 +419,7 @@ public class PDFGeneratorImpl implements PDFGenerator {
             }
 
             if (log.isDebugEnabled()) {
-                log.debug("Writing PDF file " + file.getAbsolutePath());
+                log.debug("(Vorgangs-ID: " + ProcessIdHolder.processId.get() + ") " + "Writing PDF file " + file.getAbsolutePath());
             }
 
             doc.save(file);
@@ -397,9 +437,10 @@ public class PDFGeneratorImpl implements PDFGenerator {
 
         if (typeOfPDFMerge.equals(PDFCreationConstants.ORIGINAL_PDF_WITH_FILES)) {
 
-            if (Validator.isNotNull(taxAssessmentFile)) {
-                srcFiles.add(new AbstractMap.SimpleImmutableEntry<>(taxAssessmentFile.getPath(), taxAssessmentFile.getName()));
+            for (TaxFileModel taxAssessmentFile : taxAssessmentFiles) {
+                srcFiles.add(new AbstractMap.SimpleImmutableEntry<>(taxAssessmentFile.getFile().getPath(), taxAssessmentFile.getFilename()));
             }
+
             if (onlineApplicationFormModel.getApplicantAndFundsModel().isApplicantExpenses()) {
                 for (ExpensesModel value : onlineApplicationFormModel.getApplicantExpenses()) {
                     for (ApplicantFileModel element : value.getFiles()) {
@@ -449,21 +490,25 @@ public class PDFGeneratorImpl implements PDFGenerator {
 
         try (FileOutputStream fos = new FileOutputStream(zipFile)) {
             if (log.isDebugEnabled()) {
-                log.debug("Creating ZIP file " + zipFile.getAbsolutePath());
+                log.debug("(Vorgangs-ID: " + ProcessIdHolder.processId.get() + ") " + "Creating ZIP file " + zipFile.getAbsolutePath());
             }
+
+            ProcessStepHolder.processStep.set("Erzeugung der ZIP-Datei");
 
             generateZIP(srcFiles, fos);
 
             if (log.isDebugEnabled()) {
-                log.debug("Encrypting ZIP file " + zipFile.getAbsolutePath());
+                log.debug("(Vorgangs-ID: " + ProcessIdHolder.processId.get() + ") " + "Encrypting ZIP file " + zipFile.getAbsolutePath());
             }
+
+            ProcessStepHolder.processStep.set("Verschlüsselung der ZIP-Datei mittels GPG");
 
             encryptedZipFile = pgEncryptor.encryptFile(zipFile);
 
             pdfGenerationResult.encryptedZipFile = encryptedZipFile;
             pdfGenerationResult.targetEncryptedZipFileName = targetEncryptedZipFileName;
         } catch (Exception e) {
-            log.error("Error while generating PDF or ZIP: " + e.getMessage(), e);
+            log.error("(Vorgangs-ID: " + ProcessIdHolder.processId.get() + ") " + "Error while generating PDF or ZIP: " + e.getMessage(), e);
 
             deleteWithOverwrite(file);
             for (AbstractMap.SimpleImmutableEntry<String, String> element : srcFiles) {
@@ -495,12 +540,14 @@ public class PDFGeneratorImpl implements PDFGenerator {
     @Override
     public void uploadToDav(File encryptedZipFile, String targetEncryptedZipFileName, InternetAddress from) throws Exception {
         if (log.isDebugEnabled()) {
-            log.debug("Uploading encrypted ZIP file " + encryptedZipFile.getAbsolutePath() + " to WebDAV");
+            log.debug("(Vorgangs-ID: " + ProcessIdHolder.processId.get() + ") " + "Uploading encrypted ZIP file " + encryptedZipFile.getAbsolutePath() + " to WebDAV");
         }
         try {
+            ProcessStepHolder.processStep.set("Upload der ZIP-Datei in die DAP");
+
             webDavService.uploadFileToWebDav(encryptedZipFile, targetEncryptedZipFileName);
         } catch (Exception e) {
-            log.error("Error while uploading to WebDAV: " + e.getMessage(), e);
+            log.error("(Vorgangs-ID: " + ProcessIdHolder.processId.get() + ") " + "Error while uploading to WebDAV: " + e.getMessage(), e);
 
             mailService.sendEmail(generateErrorMailMessage(e, from));
 
@@ -517,14 +564,14 @@ public class PDFGeneratorImpl implements PDFGenerator {
         MailMessage mailMessage = new MailMessage();
         mailMessage.setFrom(from);
         mailMessage.setTo(new InternetAddress(pdfConfiguration.eMailRecipient()));
-        mailMessage.setHTMLFormat(true);
+        mailMessage.setHTMLFormat(false);
         mailMessage.setSubject(pdfConfiguration.errorEMailSubject());
-        mailMessage.setBody(pdfConfiguration.errorEMailText() + e.getMessage());
+        mailMessage.setBody(pdfConfiguration.errorEMailText() + "\n\nVerarbeitungsschritt: " + ProcessStepHolder.processStep.get() + "\n\nFehlermeldung: " + e.getMessage() + "\n\nVorgangs-ID: " + ProcessIdHolder.processId.get());
         return mailMessage;
     }
     private void deleteWithOverwrite(File fileToDelete) throws IOException {
         if (log.isDebugEnabled()) {
-            log.debug("Deleting file with overwrite: " + fileToDelete.getAbsolutePath());
+            log.debug("(Vorgangs-ID: " + ProcessIdHolder.processId.get() + ") " + "Deleting file with overwrite: " + fileToDelete.getAbsolutePath());
         }
 
         for (int i = 0; i < 3; i++) {
@@ -540,7 +587,7 @@ public class PDFGeneratorImpl implements PDFGenerator {
         int numberOfPages = pdDocument.getNumberOfPages();
 
         if (log.isDebugEnabled()) {
-            log.debug("Adding " + numberOfPages + " pages from " + originalFilename + " to the final PDF");
+            log.debug("(Vorgangs-ID: " + ProcessIdHolder.processId.get() + ") " + "Adding " + numberOfPages + " pages from " + originalFilename + " to the final PDF");
         }
 
         for (int i = 0; i < numberOfPages; i++) {

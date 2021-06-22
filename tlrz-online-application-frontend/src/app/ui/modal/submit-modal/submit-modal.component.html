@@ -32,17 +32,23 @@
         </p>
 
         <progressbar [value]="this.progress"></progressbar>
+
+        <br/>
+
+        <p class="text-center">
+            {{this.statusinfo}}
+        </p>
     </div>
 
     <div *ngIf="this.step == 3" class="block-center">
 
         <div *ngIf="this.pdfURL ? this.pdfURL.length > 0 : false ">
             <p>
-                Ihr Online-Kurzantrag auf Beihilfe wurde am {{this.time}} Uhr (Ortszeit Erfurt) angenommen.
+                Ihr Online-Kurzantrag auf Beihilfe wurde am {{this.time}} Uhr (Ortszeit Erfurt) mit der Vorgangs-ID {{this.processId}} angenommen.
             </p>
         </div>
 
-        <p *ngIf="this.pdfURL ? this.pdfURL.length <= 0 : true "> Bei der Verarbeitung Ihres Antrages am {{this.time}} Uhr ist ein Fehler aufgetreten. Bitte wenden Sie sich zur Klärung an das <a href="https://verwaltung.thueringen.de/web/guest/kontakt" target="_blank">Service Center</a>. Geben Sie hier bitte das Datum und die Uhrzeit dieser Fehlermeldung sowie Ihren Namen und Vornamen an. </p>
+        <p *ngIf="this.pdfURL ? this.pdfURL.length <= 0 : true "> Bei der Verarbeitung Ihres Antrages am {{this.time}} Uhr mit der Vorgangs-ID {{this.processId}} ist ein Fehler aufgetreten. Bitte wenden Sie sich zur Klärung an das <a href="https://verwaltung.thueringen.de/web/guest/kontakt" target="_blank">Service Center</a>. Geben Sie hier bitte das Datum und die Uhrzeit sowie die Vorgangs-ID dieser Fehlermeldung sowie Ihren Namen und Vornamen an. </p>
 
         <div class="d-flex justify-content-between previous-next">
             <button *ngIf="this.pdfURL ? this.pdfURL.length > 0 : false " (click)="showPdf()" class="btn btn-primary custom-button" type="button">

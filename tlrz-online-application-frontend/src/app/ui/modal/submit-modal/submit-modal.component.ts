@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, Input, OnInit} from '@angular/core';
 import {formatDate} from "@angular/common";
 
 import {BsModalRef, ProgressbarConfig} from "ngx-bootstrap";
@@ -8,9 +8,15 @@ import {applicationContext} from "../../../../environments/environment";
 import {Router} from "@angular/router";
 
 import {IndexedDatabaseService} from "../../../core/indexed-database/indexed-database.service";
+import {SessionTimerService} from "../../../core/session-timer/session-timer.service";
 
 interface Files {
     size: number;
+}
+
+interface FormDataEntrySize {
+    name: string;
+    low, high: number;
 }
 
 export function getProgressbarConfig(): ProgressbarConfig {
@@ -35,7 +41,6 @@ export enum SubmitStep {
 
 })
 export class SubmitModalComponent implements OnInit {
-
     step: SubmitStep;
     /* TODO: remove 'any' type */
     formData: any;
@@ -45,11 +50,13 @@ export class SubmitModalComponent implements OnInit {
     offset: string = applicationContext.offset;
     time: string;
     rowTime: string;
+    processId: string;
 
     files: Files = {size: 0};
 
     progress: number;
     pdfURL: string;
+    statusinfo: string;
 
     pdf: Blob;
 
@@ -59,7 +66,8 @@ export class SubmitModalComponent implements OnInit {
         public bsModalRef: BsModalRef,
         public formService: FormService,
         private router: Router,
-        private storageService: IndexedDatabaseService
+        private storageService: IndexedDatabaseService,
+        private sessionTimerService: SessionTimerService
     ) {
     }
 
@@ -71,6 +79,8 @@ export class SubmitModalComponent implements OnInit {
             ', um ' +
             formatDate(currentDate, 'HH:mm', 'en-US', this.offset);
         this.rowTime = formatDate(currentDate, 'yyyy-MM-dd-HH-mm-ss-SSS', 'en-US', this.offset)
+
+        this.statusinfo = 'Daten werden übertragen';
     }
 
     public submit() {
@@ -79,17 +89,38 @@ export class SubmitModalComponent implements OnInit {
 
             this.files = {size: 0};
             let formData = new FormData();
+            let formSizes: Array<FormDataEntrySize> = [];
 
-            this.formService.objectToFormData(this.formData, formData, this.files);
+            this.formService.objectToFormData(this.formData, formData, this.files, formSizes);
 
             formData.append('amount', this.amount.toString());
             formData.append('filesCount', this.filesCount.toString());
             formData.append('pdfCreationTime', this.time);
             formData.append('pdfCreationRowTime', this.rowTime);
 
+            let processId = localStorage.getItem('processId');
+            formData.append('processId', processId);
+
             if (this.files.size <= 100000000) {
 
                 this.progress = 0;
+
+                let unloadEventHandler = (event) => {
+                    event.preventDefault();
+
+                    event.returnValue = 'Ihr Antrag wird noch übermittelt. Wollen Sie die Seite wirklich verlassen?';
+                };
+
+                let refreshSessionHandler = (event) => {
+                    if (Liferay && Liferay.Session) {
+                        Liferay.Session.extend();
+                    }
+                    this.sessionTimerService.resetTimer();
+                }
+
+                window.addEventListener('beforeunload', unloadEventHandler);
+
+                let refreshSessionHandlerToken = window.setInterval(refreshSessionHandler, 60000);
 
                 this.formService.submitForm(formData).subscribe(
                     value => {
@@ -99,6 +130,32 @@ export class SubmitModalComponent implements OnInit {
                         switch (value.type) {
                             case 'progress':
                                 this.progress = parseInt(value.message);
+
+                                if (this.progress < 100) {
+
+                                    let lastEntry = formSizes[formSizes.length - 1];
+
+                                    let fileIndex = 0;
+
+                                    for (let entry of formSizes) {
+                                        if (entry.high < value.bytesLoaded) {
+                                            if (lastEntry.high < entry.high) {
+                                                lastEntry = entry;
+
+                                                fileIndex++;
+                                            }
+                                        }
+                                    }
+
+                                    if (lastEntry.name !== 'Form') {
+                                      this.statusinfo = 'Datei ' + (fileIndex) + ' von ' + (formSizes.length - 1) + ' wurde erfolgreich hochgeladen';
+                                    }
+                                } else {
+                                    this.statusinfo = 'Datei ' + (formSizes.length - 1) + ' von ' + (formSizes.length - 1) + ' wurde erfolgreich hochgeladen';
+
+                                    this.statusinfo = 'PDF-Quittung wird erstellt';
+                                }
+
                                 break;
                             case 'body':
                                 this.pdf = new Blob([value.message], {type: 'application/pdf'});
@@ -110,6 +167,7 @@ export class SubmitModalComponent implements OnInit {
                                 }
 
                                 this.time = value.xCreated;
+                                this.processId = value.processId;
 
                                 if (value.contentDisposition) {
                                     if (value.contentDisposition.indexOf('filename*=') > -1) {
@@ -124,10 +182,25 @@ export class SubmitModalComponent implements OnInit {
                                 }
 
                                 this.step = 3;
+
+                                window.removeEventListener('beforeunload', unloadEventHandler);
+
+                                window.clearInterval(refreshSessionHandlerToken);
+
+                                localStorage.clear();
+                                this.storageService.clearData();
+
                                 break;
                         }
                     }, () => {
                         this.step = 3;
+
+                        window.removeEventListener('beforeunload', unloadEventHandler);
+
+                        window.clearInterval(refreshSessionHandlerToken);
+
+                        localStorage.clear();
+                        this.storageService.clearData();
                     });
             }
         }

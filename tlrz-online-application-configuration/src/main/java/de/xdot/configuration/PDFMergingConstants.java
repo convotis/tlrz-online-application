@@ -33,4 +33,6 @@ public class PDFMergingConstants {
     public static final String WEB_DAV_PASSWORD = "web-dav-password";
 
     public static final String WEB_DAV_USERNAME = "web-dav-username";
+
+    public static final String WEB_DAV_PREEMTIVE_AUTHENTICATION = "web-dav-preemtive-authentication";
 }

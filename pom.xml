@@ -134,4 +134,40 @@
         </repository>
     </repositories>
 
+    <profiles>
+        <profile>
+            <!-- activate this profile to enable automatic deployment to the local liferay server while executing package task -->
+            <id>automatic_deployment_local</id>
+            <properties>
+                <!--suppress UnresolvedMavenProperty -->
+                <liferayHome>${maven.multiModuleProjectDirectory}/bundles</liferayHome>
+                <!-- Default deployment folder is deploy inside liferay.home -->
+                <liferay.auto.deploy.dir>${liferayHome}/deploy</liferay.auto.deploy.dir>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <version>1.8</version>
+                        <executions>
+                            <execution>
+                                <id>deploy_me</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <target name="maven-deploy">
+                                        <copy failonerror="false" file="${project.build.directory}/${project.build.finalName}.war" quiet="true" tofile="${liferay.auto.deploy.dir}/${project.build.finalName}.war" />
+                                        <copy failonerror="false" file="${project.build.directory}/${project.build.finalName}.jar" quiet="true" tofile="${liferay.auto.deploy.dir}/${project.build.finalName}.jar" />
+                                        <copy failonerror="false" file="dist/${project.build.finalName}.war" quiet="true" tofile="${liferay.auto.deploy.dir}/${project.build.finalName}.war" />
+                                    </target>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>

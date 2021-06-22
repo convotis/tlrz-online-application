@@ -1,4 +1,5 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {SessionTimerService} from "../../../core/session-timer/session-timer.service";
 
 @Component({
   selector: 'tlrz-previos-next-btn',
@@ -13,21 +14,33 @@ export class PreviosNextBtnComponent implements OnInit {
     @Output() previous: EventEmitter<void> = new EventEmitter<void>();
     @Output() next: EventEmitter<void> = new EventEmitter<void>();
 
-  constructor() { }
+  constructor(private sessionTimerService: SessionTimerService) {
+
+  }
 
   ngOnInit() {
   }
 
   previousBtn(): void {
-      Liferay.Session.extend();
+      if (Liferay && Liferay.Session) {
+          Liferay.Session.extend();
+      }
+      this.sessionTimerService.resetTimer();
 
       this.previous.emit();
   }
 
   nextBtn(): void {
-      Liferay.Session.extend();
+      if (Liferay && Liferay.Session) {
+          Liferay.Session.extend();
+      }
+      this.sessionTimerService.resetTimer();
 
       this.next.emit();
+  }
+
+  public get nextButtonDisabled(): boolean {
+      return this.disabledNextBtn || (! this.sessionTimerService.sessionValid);
   }
 
 }

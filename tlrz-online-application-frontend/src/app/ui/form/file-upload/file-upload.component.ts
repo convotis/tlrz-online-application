@@ -11,6 +11,7 @@ import {
     ViewChild
 } from '@angular/core';
 import {ControlValueAccessor, NgControl} from '@angular/forms';
+import {SessionTimerService} from "../../../core/session-timer/session-timer.service";
 
 @Component({
     selector: 'tlrz-file-upload',
@@ -41,7 +42,8 @@ export class FileUploadComponent implements ControlValueAccessor {
 
     constructor(@Self() @Optional() public control: NgControl,
                 private host: ElementRef<HTMLInputElement>,
-                private renderer: Renderer2) {
+                private renderer: Renderer2,
+                private sessionTimerService: SessionTimerService) {
         if (this.control) {
             this.control.valueAccessor = this;
         }
@@ -68,13 +70,19 @@ export class FileUploadComponent implements ControlValueAccessor {
     }
 
     public addField(): void {
-        Liferay.Session.extend();
+        if (Liferay && Liferay.Session) {
+            Liferay.Session.extend();
+        }
+        this.sessionTimerService.resetTimer();
 
         this.add.emit();
     }
 
     public removeField(): void {
-        Liferay.Session.extend();
+        if (Liferay && Liferay.Session) {
+            Liferay.Session.extend();
+        }
+        this.sessionTimerService.resetTimer();
 
         this.remove.emit();
     }

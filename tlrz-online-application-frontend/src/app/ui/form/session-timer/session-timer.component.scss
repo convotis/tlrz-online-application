@@ -1,0 +1,10 @@
+.session-timer {
+    color: #0089c1;
+    font-size: 15px;
+    font-family: "MetaBold", arial, sans serif;
+    text-align: right;
+
+    &.warn {
+        color: red;
+    }
+}

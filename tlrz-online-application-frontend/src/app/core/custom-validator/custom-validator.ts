@@ -87,25 +87,38 @@ export class CustomValidator {
         }
     }
 
-    static requiredFile(fileControl: AbstractControl): any {
+    static requiredFile(files: FormArray): any {
         return (radioControl: AbstractControl) => {
 
             const radioValue = radioControl.value;
-            const file = fileControl.value;
+            let filePresent = false;
+            let fileControl;
+
+            for (let control of files.controls) {
+                if (control.get('file')) {
+                    fileControl = control.get('file');
+
+                    if (fileControl.value) {
+                        filePresent = true;
+                    }
+
+                    break;
+                }
+            }
 
             /* TODO: move magic numbers to enum */
-            if (radioValue == '2' && !file) {
+            if (radioValue == '2' && !filePresent) {
                 return {
                     requiredFile: true
                 }
             }
 
             /* TODO: move magic number to enum */
-            if (radioValue != '2' && file) {
+            if (radioValue != '2' && filePresent) {
                 fileControl.updateValueAndValidity({onlySelf: true, emitEvent: false});
             }
 
-            if (file && radioValue && radioControl.valid && !fileControl.valid) {
+            if (filePresent && radioValue && radioControl.valid && !fileControl.valid) {
                 fileControl.updateValueAndValidity({onlySelf: true, emitEvent: false});
             }
             return null;

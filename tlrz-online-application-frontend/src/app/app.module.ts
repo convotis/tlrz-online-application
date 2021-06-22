@@ -11,6 +11,7 @@ import {AppComponent} from './app.component';
 import {ReturnModalComponent} from "./ui/modal/return-modal/return-modal.component";
 import {HomeModalComponent} from "./ui/modal/home-modal/home-modal.component";
 import {SubmitModalComponent} from './ui/modal/submit-modal/submit-modal.component';
+import {SessionTimeoutModalComponent} from "./ui/modal/session-timeout-modal/session-timeout-modal-component";
 
 @NgModule({
     declarations: [
@@ -18,6 +19,7 @@ import {SubmitModalComponent} from './ui/modal/submit-modal/submit-modal.compone
         HomeModalComponent,
         AppComponent,
         SubmitModalComponent,
+        SessionTimeoutModalComponent
     ],
     imports: [
         ModalModule.forRoot(),
@@ -39,7 +41,8 @@ import {SubmitModalComponent} from './ui/modal/submit-modal/submit-modal.compone
         TooltipContainerComponent,
         ReturnModalComponent,
         HomeModalComponent,
-        SubmitModalComponent
+        SubmitModalComponent,
+        SessionTimeoutModalComponent
     ],
     bootstrap: [AppComponent],
 })

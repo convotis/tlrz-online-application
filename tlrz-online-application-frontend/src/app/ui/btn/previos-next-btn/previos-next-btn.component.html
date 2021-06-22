@@ -6,7 +6,7 @@
     </div>
     <div>
         <button (click)="nextBtn()"
-                [disabled]="disabledNextBtn"
+                [disabled]="nextButtonDisabled"
                 class="btn btn-primary custom-button"
                 type="submit">
             {{ this.nextLabel ? this.nextLabel : 'Weiter' }} <span class="icon icon-arrow-right" aria-hidden="true"></span>

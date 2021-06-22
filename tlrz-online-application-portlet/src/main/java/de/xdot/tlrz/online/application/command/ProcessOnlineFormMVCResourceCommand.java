@@ -19,6 +19,7 @@ import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.MimeTypesUtil;
+import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.PrefsPropsUtil;
@@ -34,7 +35,10 @@ import de.xdot.pdf.creation.model.sub.ApplicantFileModel;
 import de.xdot.pdf.creation.model.sub.ExpensesModel;
 import de.xdot.pdf.creation.model.sub.PartnerIncomeConfirmationModel;
 import de.xdot.pdf.creation.model.sub.ServiceUsageModel;
+import de.xdot.pdf.creation.model.sub.TaxFileModel;
 import de.xdot.pdf.creation.service.PDFGenerator;
+import de.xdot.pdf.creation.status.ProcessIdHolder;
+import de.xdot.pdf.creation.status.ProcessStepHolder;
 import de.xdot.tlrz.online.application.constants.OnlineAppPortletKeys;
 import de.xdot.tlrz.online.application.util.CustomValidator;
 import org.osgi.service.component.annotations.Component;
@@ -83,6 +87,7 @@ public class ProcessOnlineFormMVCResourceCommand extends BaseMVCResourceCommand 
 
     private static final int MAX_BELEG = 20;
     private static final int MAX_FILES = 50;
+    private static final int MAX_TAX_FILES = 20;
 
     @Reference
     private Portal portal;
@@ -107,8 +112,17 @@ public class ProcessOnlineFormMVCResourceCommand extends BaseMVCResourceCommand 
         Calendar calendar = Calendar.getInstance(themeDisplay.getTimeZone(), themeDisplay.getLocale());
         String pdfCreationTime = FastDateFormatFactoryUtil.getSimpleDateFormat("dd.MM.yyyy', um 'HH:mm", themeDisplay.getLocale(), themeDisplay.getTimeZone()).format(calendar.getTime());
         String pdfCreationRowTime = FastDateFormatFactoryUtil.getSimpleDateFormat("yyyy-MM-dd-HH-mm-ss-SSS", themeDisplay.getLocale(), themeDisplay.getTimeZone()).format(calendar.getTime());
+
+        String processId = "";
+
         try {
-            portal.getUploadPortletRequest(resourceRequest);
+            ProcessStepHolder.processStep.set("Auslesen der hochgeladenen Dateien");
+
+            UploadPortletRequest uploadPortletRequest = portal.getUploadPortletRequest(resourceRequest);
+
+            processId = ParamUtil.getString(uploadPortletRequest, "processId");
+
+            ProcessIdHolder.processId.set(processId);
 
             UploadException uploadException = (UploadException)resourceRequest.getAttribute(WebKeys.UPLOAD_EXCEPTION);
 
@@ -150,6 +164,7 @@ public class ProcessOnlineFormMVCResourceCommand extends BaseMVCResourceCommand 
 
             httpRes.setHeader("x-created", pdfCreationTime);
             httpRes.setHeader("x-status", "ok");
+            httpRes.setHeader("x-processId", processId);
 
             ServletResponseUtil.sendFile(httpReq, httpRes, fileName.toString(), in, ContentTypes.APPLICATION_PDF);
 
@@ -158,8 +173,9 @@ public class ProcessOnlineFormMVCResourceCommand extends BaseMVCResourceCommand 
             HttpServletResponse httpRes = PortalUtil.getHttpServletResponse(resourceResponse);
             httpRes.setHeader("x-created", pdfCreationTime);
             httpRes.setHeader("x-status", "error");
+            httpRes.setHeader("x-processId", processId);
 
-            log.error("Error occurred during processing form", e);
+            log.error("(Vorgangs-ID: " + ProcessIdHolder.processId.get() + ") " + "Error occurred during processing form", e);
             throw new PortalException(e);
         } finally {
             if (pdfFile != null) {
@@ -184,8 +200,10 @@ public class ProcessOnlineFormMVCResourceCommand extends BaseMVCResourceCommand 
 
     private OnlineApplicationFormModel generateOnlineApplicationFormModel(ResourceRequest resourceRequest, InternetAddress from, String pdfCreationTime, String pdfCreationRowTime) throws AddressException, IOException, InterruptedException, PortalException {
         if (log.isDebugEnabled()) {
-            log.debug("Starting to generate Application Form Model from request data");
+            log.debug("(Vorgangs-ID: " + ProcessIdHolder.processId.get() + ") " + "Starting to generate Application Form Model from request data");
         }
+
+        ProcessStepHolder.processStep.set("Auslesen und Verarbeiten der eingegebenen Formulardaten");
 
         UploadPortletRequest uploadPortletRequest = portal.getUploadPortletRequest(resourceRequest);
 
@@ -217,13 +235,13 @@ public class ProcessOnlineFormMVCResourceCommand extends BaseMVCResourceCommand 
 
             String amount = uploadPortletRequest.getParameter("amount");
             if (log.isDebugEnabled()) {
-                log.debug("Application Form Model.Amount = " + amount);
+                log.debug("(Vorgangs-ID: " + ProcessIdHolder.processId.get() + ") " + "Application Form Model.Amount = " + amount);
             }
             onlineApplicationFormModel.setAmount(amount);
 
             String filesCount = uploadPortletRequest.getParameter("filesCount");
             if (log.isDebugEnabled()) {
-                log.debug("Application Form Model.FilesCount = " + filesCount);
+                log.debug("(Vorgangs-ID: " + ProcessIdHolder.processId.get() + ") " + "Application Form Model.FilesCount = " + filesCount);
             }
             onlineApplicationFormModel.setFilesCount(filesCount);
 
@@ -236,18 +254,18 @@ public class ProcessOnlineFormMVCResourceCommand extends BaseMVCResourceCommand 
         }
         return onlineApplicationFormModel;
     }
-    private MailMessage generateErrorMailMessage(Throwable e, InternetAddress from) throws AddressException {
 
+    private MailMessage generateErrorMailMessage(Throwable e, InternetAddress from) throws AddressException {
         MailMessage mailMessage = new MailMessage();
         mailMessage.setFrom(from);
         mailMessage.setTo(new InternetAddress(pdfConfiguration.eMailRecipient()));
-        mailMessage.setHTMLFormat(true);
+        mailMessage.setHTMLFormat(false);
         mailMessage.setSubject(pdfConfiguration.errorEMailSubject());
-        mailMessage.setBody(pdfConfiguration.errorEMailText() + "Error occurring during extraction data from submitted form");
+        mailMessage.setBody(pdfConfiguration.errorEMailText() + "\n\nVerarbeitungsschritt: " + ProcessStepHolder.processStep.get() + "\n\nFehlermeldung: " + e.getMessage() + "\n\nVorgangs-ID: " + ProcessIdHolder.processId.get());
         return mailMessage;
     }
 
-    private ApplicantAndFundsModel getApplicantAndFundsModel(UploadPortletRequest uploadPortletRequest) throws PortalException {
+    private ApplicantAndFundsModel getApplicantAndFundsModel(UploadPortletRequest uploadPortletRequest) throws PortalException, IOException {
         ApplicantAndFundsModel applicantAndFundsModel = new ApplicantAndFundsModel();
         User user = portal.getUser(uploadPortletRequest);
 
@@ -315,26 +333,18 @@ public class ProcessOnlineFormMVCResourceCommand extends BaseMVCResourceCommand 
 
         partnerIncomeConfirmationModel.setPreCalendarYear(preCalendarYear);
 
-        File taxAssessmentFile = uploadPortletRequest.getFile("applicantAndFunds-partnerIncomeConfirmation-taxAssessmentFile");
-        String taxAssessmentFileName = uploadPortletRequest.getFileName("applicantAndFunds-partnerIncomeConfirmation-taxAssessmentFile");
-
-        if (log.isDebugEnabled()) {
-            log.debug("Uploaded tax assessment file = " + taxAssessmentFile);
-        }
         if (expensesForPartner && confirmation == 2 && preCalendarYear) {
-            CustomValidator.checkRequired(taxAssessmentFile);
-            CustomValidator.checkMaxSize(taxAssessmentFile, 10485760);
-            CustomValidator.checkRequiredFileExtension(taxAssessmentFileName, ".pdf", ".jpg", ".jpeg", ".gif", ".bmp", ".png");
+            List<TaxFileModel> taxFileModels = createTaxFileModels(uploadPortletRequest);
+
+            partnerIncomeConfirmationModel.setTaxAssessmentFiles(taxFileModels);
         }
-        partnerIncomeConfirmationModel.setTaxAssessmentFile(taxAssessmentFile);
-        partnerIncomeConfirmationModel.setTaxAssessmentFileName(taxAssessmentFileName);
 
         partnerIncomeConfirmationModel.setCalendarYear(Boolean.parseBoolean(uploadPortletRequest.getParameter("applicantAndFunds-partnerTotalIncome-currentCalendarYear")));
         partnerIncomeConfirmationModel.setPreCalendarYear(Boolean.parseBoolean(uploadPortletRequest.getParameter("applicantAndFunds-partnerTotalIncome-preCurrentCalendarYear")));
         applicantAndFundsModel.setPartnerIncomeConfirmation(partnerIncomeConfirmationModel);
 
         if (log.isDebugEnabled()) {
-            log.debug("Generated Applicant and Funds Model = " + applicantAndFundsModel);
+            log.debug("(Vorgangs-ID: " + ProcessIdHolder.processId.get() + ") " + "Generated Applicant and Funds Model = " + applicantAndFundsModel);
         }
 
         return applicantAndFundsModel;
@@ -363,7 +373,7 @@ public class ProcessOnlineFormMVCResourceCommand extends BaseMVCResourceCommand 
         }
 
         if (log.isDebugEnabled()) {
-            log.debug("Generated Service Usage model = " + serviceUsageModel);
+            log.debug("(Vorgangs-ID: " + ProcessIdHolder.processId.get() + ") " + "Generated Service Usage model = " + serviceUsageModel);
         }
 
         return serviceUsageModel;
@@ -386,11 +396,11 @@ public class ProcessOnlineFormMVCResourceCommand extends BaseMVCResourceCommand 
 
         List<String> paramKeys = new ArrayList<>(uploadPortletRequest.getParameterMap().keySet());
         if (log.isDebugEnabled()) {
-            log.debug("Request keys = " + paramKeys);
+            log.debug("(Vorgangs-ID: " + ProcessIdHolder.processId.get() + ") " + "Request keys = " + paramKeys);
         }
         Collections.sort(paramKeys);
         if (log.isDebugEnabled()) {
-            log.debug("Sorted Request keys = " + paramKeys);
+            log.debug("(Vorgangs-ID: " + ProcessIdHolder.processId.get() + ") " + "Sorted Request keys = " + paramKeys);
         }
 
         List<String> entityExpensesParamKeys = paramKeys
@@ -399,7 +409,7 @@ public class ProcessOnlineFormMVCResourceCommand extends BaseMVCResourceCommand 
             .collect(Collectors.toList());
 
         if (log.isDebugEnabled()) {
-            log.debug("Filtered entity Param keys = " + entityExpensesParamKeys);
+            log.debug("(Vorgangs-ID: " + ProcessIdHolder.processId.get() + ") " + "Filtered entity Param keys = " + entityExpensesParamKeys);
         }
 
         for (int paramFirstindex = 1; paramFirstindex <= MAX_BELEG; paramFirstindex++) {
@@ -516,7 +526,7 @@ public class ProcessOnlineFormMVCResourceCommand extends BaseMVCResourceCommand 
         String filename = prefix.toString();
 
         if (log.isDebugEnabled()) {
-            log.debug("Found uploaded file for Expenses: [uploadedFileName = " + uploadedFileName + ", uploadedFile = " + uploadedFile + ", originalFilename = " + originalFilename + "]");
+            log.debug("(Vorgangs-ID: " + ProcessIdHolder.processId.get() + ") " + "Found uploaded file for Expenses: [uploadedFileName = " + uploadedFileName + ", uploadedFile = " + uploadedFile + ", originalFilename = " + originalFilename + "]");
         }
 
         applicantFileModel.setFile(uploadedFile);
@@ -525,6 +535,49 @@ public class ProcessOnlineFormMVCResourceCommand extends BaseMVCResourceCommand 
         applicantFileModel.setType(type);
 
         return applicantFileModel;
+    }
+
+    private List<TaxFileModel> createTaxFileModels(UploadPortletRequest uploadPortletRequest) throws IOException, PortalException {
+        List<TaxFileModel> taxFileModels = new ArrayList<>();
+
+        final String paramPrefix = "applicantAndFunds-partnerIncomeConfirmation-";
+
+        List<String> paramKeys = new ArrayList<>(uploadPortletRequest.getParameterMap().keySet());
+
+        for (int i = 1; i <= MAX_TAX_FILES; i++) {
+            String innerParamPrefix = paramPrefix + "files-" + i + "-";
+
+            String paramFile = innerParamPrefix + "file";
+            String paramFileDataURI = innerParamPrefix + "file-dataURI";
+            if ( (paramKeys.contains(paramFile)) || (paramKeys.contains(paramFileDataURI)) ) {
+                TaxFileModel taxFileModel = createTaxFileModel(uploadPortletRequest, innerParamPrefix);
+
+                taxFileModels.add(taxFileModel);
+            }
+        }
+
+        return taxFileModels;
+    }
+
+    private TaxFileModel createTaxFileModel(UploadPortletRequest uploadPortletRequest, String innerParamPrefix) throws IOException, PortalException {
+        TaxFileModel taxFileModel = new TaxFileModel();
+
+        File uploadedFile = getUploadedFile(uploadPortletRequest, innerParamPrefix);
+
+        String uploadedFileName = getUploadedFileName(uploadPortletRequest, innerParamPrefix);
+
+        CustomValidator.checkRequired(uploadedFile);
+        CustomValidator.checkMaxSize(uploadedFile, 10485760);
+        CustomValidator.checkRequiredFileExtension(uploadedFileName, ".pdf", ".jpg", ".jpeg", ".gif", ".bmp", ".png");
+
+        if (log.isDebugEnabled()) {
+            log.debug("(Vorgangs-ID: " + ProcessIdHolder.processId.get() + ") " + "Found uploaded tax file: [uploadedFileName = " + uploadedFileName + ", uploadedFile = " + uploadedFile + "]");
+        }
+
+        taxFileModel.setFile(uploadedFile);
+        taxFileModel.setFilename(uploadedFileName);
+
+        return taxFileModel;
     }
 
     private String getUploadedFileName(UploadPortletRequest uploadPortletRequest, String innerParamPrefix) {
@@ -545,14 +598,14 @@ public class ProcessOnlineFormMVCResourceCommand extends BaseMVCResourceCommand 
 
         File file = uploadPortletRequest.getFile(paramFile);
         if (log.isDebugEnabled()) {
-            log.debug("Uploaded binary file for key " + paramFile + " = " + file);
+            log.debug("(Vorgangs-ID: " + ProcessIdHolder.processId.get() + ") " + "Uploaded binary file for key " + paramFile + " = " + file);
         }
 
         if (Validator.isNull(file)) {
             String dataURI = uploadPortletRequest.getParameter(paramFileDataURI);
 
             if (log.isDebugEnabled()) {
-                log.debug("Uploaded data URI file for key " + paramFileDataURI + " = " + (dataURI == null ? "null" : "[length = " + dataURI.length() + "]"));
+                log.debug("(Vorgangs-ID: " + ProcessIdHolder.processId.get() + ") " + "Uploaded data URI file for key " + paramFileDataURI + " = " + (dataURI == null ? "null" : "[length = " + dataURI.length() + "]"));
             }
 
             if (Validator.isNotNull(dataURI)) {
@@ -636,7 +689,7 @@ public class ProcessOnlineFormMVCResourceCommand extends BaseMVCResourceCommand 
 
     private void deleteWithOverwrite(File fileToDelete) throws IOException {
         if (log.isDebugEnabled()) {
-            log.debug("Deleting file with overwrite: " + fileToDelete.getAbsolutePath());
+            log.debug("(Vorgangs-ID: " + ProcessIdHolder.processId.get() + ") " + "Deleting file with overwrite: " + fileToDelete.getAbsolutePath());
         }
 
         for (int i = 0; i < 3; i++) {

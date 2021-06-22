@@ -6,6 +6,7 @@ import {BsModalRef} from 'ngx-bootstrap';
 import {applicationContext} from "../../../../environments/environment";
 
 import {IndexedDatabaseService} from "../../../core/indexed-database/indexed-database.service";
+import {SessionTimerService} from "../../../core/session-timer/session-timer.service";
 
 @Component({
   selector: 'app-home-modal',
@@ -21,7 +22,8 @@ export class HomeModalComponent {
     constructor(
         public bsModalRef: BsModalRef,
         private router: Router,
-        private storageService: IndexedDatabaseService
+        private storageService: IndexedDatabaseService,
+        private sessionTimerService: SessionTimerService
     ) {
     }
 
@@ -30,6 +32,7 @@ export class HomeModalComponent {
         this.storageService.clearData();
         this.bsModalRef.hide();
         this.router.navigate(['/antrag']);
+        this.sessionTimerService.resetTimer();
     }
 
     public openLinkNewTab(link: string) {

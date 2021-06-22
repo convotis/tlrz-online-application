@@ -1,0 +1,30 @@
+<div [formGroup]="parentGroup">
+    <div *ngFor="let fileAndType of this.files.controls; let fileIndex=index"
+         formArrayName="files">
+
+        <div class="file-type-field" formGroupName="{{fileIndex}}">
+
+            <div class="col-md-12 margin-v-15 file-input">
+                <tlrz-file-upload
+                    (add)="addFileToFileArray(this.files, fileIndex + 1)"
+                    (remove)="removeFileFromFileArray(this.files, fileIndex)"
+                    [addButton]="true"
+                    [removeButton]="this.files.length > 1"
+                    formControlName="file"
+                    ariaLabel="Datei für den Steuerbescheid"
+                    (change)="this.updateValidity()"
+                >
+                </tlrz-file-upload>
+
+                <small *ngIf="this.fileAndType.get('file').touched &&
+                              this.fileAndType.get('file').dirty &&
+                              this.fileAndType.get('file').invalid &&
+                              this.confirmation.dirty"
+                       class="invalid-input-small">
+                    {{ this.errMsgService.getErrMsg(this.fileAndType.get('file')) }}
+                </small>
+
+            </div>
+        </div>
+    </div>
+</div>

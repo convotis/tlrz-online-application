@@ -17,10 +17,7 @@ export class FileStorageService {
         /* TODO: move hardcoded files to some enum */
 
         const fileDataURIList$ = [
-            this.createFileDataUriObj(data.applicantAndFunds.partnerIncomeConfirmation.taxAssessmentFile)
-                .pipe(tap((fileObj: FileBase64) => {
-                    data.applicantAndFunds.partnerIncomeConfirmation.taxAssessmentFile = fileObj;
-                })),
+            ...this.createFileListURI(data.applicantAndFunds.partnerIncomeConfirmation),
             ...this.createCardFileListURI(data.applicantExpenses.applicantExpensesArray),
             ...this.createCardFileListURI(data.expensesForPartner.expensesForPartnerArray),
             ...this.createCardFileListURI(data.expensesForChildren.expensesForChildrenArray)
@@ -35,11 +32,7 @@ export class FileStorageService {
 
     /* TODO: remove 'any' type*/
     public wizardBase64ToFile(data: any): any {
-        let taxAssessmentFile = data.applicantAndFunds.partnerIncomeConfirmation.taxAssessmentFile;
-        if(taxAssessmentFile) {
-            data.applicantAndFunds.partnerIncomeConfirmation.taxAssessmentFile = this.base64toFile(taxAssessmentFile.dataURI, taxAssessmentFile.name);
-        }
-
+        this.setBase64toFileList(data.applicantAndFunds.partnerIncomeConfirmation);
         this.setCardBase64toFileList(data.applicantExpenses.applicantExpensesArray);
         this.setCardBase64toFileList(data.expensesForPartner.expensesForPartnerArray);
         this.setCardBase64toFileList(data.expensesForChildren.expensesForChildrenArray);
@@ -54,6 +47,24 @@ export class FileStorageService {
         cardList.reduce(( acc: any, val: any ) => {
                 return [...acc, ...val.files];
             }, [])
+            .map(( fileContainer: any ) => {
+                if (fileContainer.file && fileContainer.file instanceof File) {
+                    const fileBase64$ = this.createFileDataUriObj(fileContainer.file)
+                        .pipe(tap((fileObj: FileBase64) => {
+                            /* TODO: here we set fileObj to main data by link but should by subscription */
+                            fileContainer.file = fileObj;
+                        }));
+                    fileDataURIList$.push(fileBase64$);
+                }
+            });
+
+        return fileDataURIList$;
+    }
+
+    private createFileListURI( files: any): Observable<File | FileBase64>[] {
+        const fileDataURIList$ = [];
+
+        files.files
             .map(( fileContainer: any ) => {
                 if (fileContainer.file && fileContainer.file instanceof File) {
                     const fileBase64$ = this.createFileDataUriObj(fileContainer.file)
@@ -102,6 +113,17 @@ export class FileStorageService {
         fileList.map(( expenses ) => {
                 return expenses.files;
             })
+            .map(( fileList ) => {
+                fileList.forEach(( fileContainer ) => {
+                    if (fileContainer.file && fileContainer.file.dataURI) {
+                        fileContainer.file = this.base64toFile(fileContainer.file.dataURI, fileContainer.file.name);
+                    }
+                });
+            });
+    }
+
+    private setBase64toFileList( fileList: any ): void {
+        fileList.files
             .map(( fileList ) => {
                 fileList.forEach(( fileContainer ) => {
                     if (fileContainer.file && fileContainer.file.dataURI) {

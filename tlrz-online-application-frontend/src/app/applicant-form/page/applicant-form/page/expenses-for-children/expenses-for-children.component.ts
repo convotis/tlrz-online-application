@@ -8,6 +8,7 @@ import {CustomValidator} from "../../../../../core/custom-validator/custom-valid
 import {FormService} from "../../../../../core/form/form.service";
 import {map} from "rxjs/operators";
 import {CardService} from "../../../../shared/card.service";
+import {SessionTimerService} from "../../../../../core/session-timer/session-timer.service";
 
 @Component({
   selector: 'tlrz-expenses-for-children',
@@ -26,7 +27,8 @@ export class ExpensesForChildrenComponent implements OnInit {
     constructor(
         private errMsgService: ErrMsgService,
         private formService: FormService,
-        private cardService: CardService
+        private cardService: CardService,
+        private sessionTimerService: SessionTimerService
     ) {
     }
 
@@ -97,7 +99,10 @@ export class ExpensesForChildrenComponent implements OnInit {
     }
 
     private addCardToMainArray(controlIndex: number) {
-        Liferay.Session.extend();
+        if (Liferay && Liferay.Session) {
+            Liferay.Session.extend();
+        }
+        this.sessionTimerService.resetTimer();
 
         if (this.expensesForChildrenArray.length < 20) {
 

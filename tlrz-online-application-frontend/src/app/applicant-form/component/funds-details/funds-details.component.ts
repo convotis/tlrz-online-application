@@ -1,4 +1,4 @@
-import {FormControl, FormGroup, Validators} from "@angular/forms";
+import {FormArray, FormControl, FormGroup, Validators} from "@angular/forms";
 import {Component, Input, OnInit} from '@angular/core';
 import {distinctUntilChanged, takeUntil} from 'rxjs/operators';
 
@@ -43,13 +43,8 @@ export class FundsDetailsComponent extends AutoUnsubscribe implements OnInit {
         return <FormControl>this.partnerIncomeConfirmation.get('confirmation');
     }
 
-    public get taxAssessmentFile(): FormControl {
-        return <FormControl>this.partnerIncomeConfirmation.get('taxAssessmentFile');
-    }
-
-    public removeAssessmentFile() {
-        this.taxAssessmentFile.patchValue(null);
-        this.confirmation.updateValueAndValidity({onlySelf: true, emitEvent: false});
+    public get files(): FormArray {
+        return <FormArray>this.partnerIncomeConfirmation.get('files');
     }
 
     constructor(
@@ -98,27 +93,30 @@ export class FundsDetailsComponent extends AutoUnsubscribe implements OnInit {
     }
 
     public setIncomeConfirmationValidators() {
-
         this.confirmation.setValidators([
             Validators.required,
-            CustomValidator.requiredFile(this.taxAssessmentFile)
+            CustomValidator.requiredFile(this.files)
         ]);
         this.confirmation.updateValueAndValidity();
 
-        this.taxAssessmentFile.setValidators([
-            CustomValidator.requiredFileExtension(".pdf, .jpg, .jpeg, .gif, .bmp, .png"),
-            CustomValidator.maxSize(10485760),
-            CustomValidator.requiredRadio(this.partnerIncomeConfirmation.controls['confirmation'])
-        ]);
-        this.taxAssessmentFile.updateValueAndValidity();
+        for (let control of this.files.controls) {
+            control.get('file').setValidators([
+                CustomValidator.requiredFileExtension(".pdf, .jpg, .jpeg, .gif, .bmp, .png"),
+                CustomValidator.maxSize(10485760),
+            ]);
+
+            control.get('file').updateValueAndValidity();
+        }
     }
 
     public removeIncomeConfirmationValidators() {
+        for (let control of this.files.controls) {
+            control.get('file').setValidators(null);
+
+            control.get('file').updateValueAndValidity();
+        }
 
         this.confirmation.setValidators(null);
         this.confirmation.updateValueAndValidity();
-
-        this.taxAssessmentFile.setValidators(null);
-        this.taxAssessmentFile.updateValueAndValidity();
     }
 }
